@@ -1,0 +1,39 @@
+{
+    "mentors": [
+      {
+        "id": "1",
+        "name": "Emma Johnson",
+        "school": "University of Toronto",
+        "program": "Computer Science",
+        "year": "Second Year",
+        "details": "University of Toronto, Second Year Computer Science",
+        "bio": "Hi! I'm a second-year CS student who loves AI and machine learning. Happy to chat about course selection, internships, or campus life!",
+        "avatar": "https://randomuser.me/api/portraits/women/32.jpg"
+      },
+      {
+        "id": "2",
+        "name": "Michael Zhang",
+        "school": "University of Waterloo",
+        "program": "Systems Design Engineering",
+        "year": "Third Year",
+        "details": "University of Waterloo, Third Year Systems Design Engineering",
+        "bio": "Engineering student with co-op experience at Microsoft and Tesla. Ask me about co-op interviews, design projects, or adapting to university.",
+        "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+      },
+      {
+        "id": "3",
+        "name": "Aisha Patel",
+        "school": "McGill University",
+        "program": "Neuroscience",
+        "year": "Fourth Year",
+        "details": "McGill University, Fourth Year Neuroscience",
+        "bio": "Research assistant in cognitive neuroscience lab. Can provide advice on research opportunities, living in Montreal, and grad school applications.",
+        "avatar": "https://randomuser.me/api/portraits/women/68.jpg"
+      }
+    ],
+    "programMentors": {
+      "University of Toronto_Computer Science": ["1"],
+      "University of Waterloo_Systems Design Engineering": ["2"],
+      "McGill University_Neuroscience": ["3"]
+    }
+  }

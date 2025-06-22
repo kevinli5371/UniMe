@@ -332,11 +332,13 @@ body {
     padding: 10px 20px;
     font-size: 0.9rem;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .mentor-button:hover {
+    text-decoration: none;
     background-color: white;
     color: #357ABD;
 }

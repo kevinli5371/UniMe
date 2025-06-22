@@ -1,11 +1,19 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 import json
 import datetime
+import os
+import random
 from match_me import INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, enhanced_interest_score, enhanced_course_score
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
+
+app.static_folder = 'static'
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory(app.static_folder, filename)
 
 with open('backend/program_profiles.json', 'r', encoding='utf-8') as f:
     programs = json.load(f)
@@ -202,6 +210,78 @@ def get_full_matches():
     except Exception as e:
         print(f"Error computing matches: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+# For Flask 2.0+ 
+mentors_data = {}
+
+def load_mentors_data():
+    global mentors_data
+    try:
+        mentors_file = os.path.join(os.path.dirname(__file__), 'mentors.json')
+        with open(mentors_file, 'r', encoding='utf-8') as f:
+            mentors_data = json.load(f)
+    except Exception as e:
+        print(f"Error loading mentors data: {e}")
+        mentors_data = {
+            "mentors": [],
+            "programMentors": {}
+        }
+
+# Load data at startup
+load_mentors_data()
+
+@app.route('/api/mentors', methods=['GET'])
+def get_all_mentors():
+    return jsonify(mentors_data.get('mentors', []))
+
+@app.route('/api/program-mentors/<path:program_key>', methods=['GET'])
+def get_program_mentors(program_key):
+    try:
+        print(f"Received request for program key: {program_key}")
+        
+        # Debug: Print all available program keys
+        available_keys = list(mentors_data.get('programMentors', {}).keys())
+        print(f"Available keys: {available_keys}")
+        
+        # Find specific mentors for this program first
+        mentor_ids = mentors_data.get('programMentors', {}).get(program_key, [])
+        print(f"Found mentor IDs for {program_key}: {mentor_ids}")
+        
+        program_mentors = [
+            mentor for mentor in mentors_data.get('mentors', []) 
+            if mentor['id'] in mentor_ids
+        ]
+        
+        # If we found ANY program-specific mentors, return them (even just one)
+        if program_mentors:
+            print(f"Found {len(program_mentors)} specific mentors for {program_key}")
+            return jsonify(program_mentors)
+        
+        # Extract university name for fallback
+        parts = program_key.split('_')
+        university = parts[0] if len(parts) >= 1 else None
+        
+        # Look for university match if no program match was found
+        if university:
+            university_mentors = [
+                mentor for mentor in mentors_data.get('mentors', [])
+                if university.lower() in mentor['school'].lower()
+            ]
+            
+            if university_mentors:
+                print(f"Found {len(university_mentors)} mentors from {university}")
+                return jsonify(university_mentors[:2])
+        
+        # Last resort: random mentors
+        print("No matches found, using random mentors")
+        all_mentors = mentors_data.get('mentors', [])
+        random_mentors = random.sample(all_mentors, min(2, len(all_mentors)))
+        
+        return jsonify(random_mentors)
+        
+    except Exception as e:
+        print(f"Error in program-mentors endpoint: {str(e)}")
+        return jsonify([])
 
 if __name__ == '__main__':
     print("Starting Flask server on port 5001...")

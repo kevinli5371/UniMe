@@ -11,10 +11,23 @@ interface Match {
     social: number;
 }
 
+interface Mentor {
+    id: string;
+    name: string;
+    school: string;
+    program: string;
+    year: string;
+    details: string;
+    bio: string;
+    avatar: string;
+    linkedin: string;
+}
+
 export default function Matches() {
     const [matches, setMatches] = useState<Match[]>([]);
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [programMentors, setProgramMentors] = useState<Mentor[]>([]);
 
     useEffect(() => {
         const data = localStorage.getItem("matches");
@@ -34,24 +47,33 @@ export default function Matches() {
         return `${Math.round(value * 100)}%`;
     };
 
-    const getMockProgramInfo = (school: string, program: string) => {
-        return {
-            uniSite: "#",
-            description: "Basic info about this program and what makes it unique. This program focuses on innovative approaches to solving complex problems.",
-            mentors: [
-                {
-                    name: "Anna Wei",
-                    details: "University of Waterloo, First Year Systems Design Engineering",
-                    avatar: "https://via.placeholder.com/80x80/4A9FE7/ffffff?text=AW"
-                },
-                {
-                    name: "Anna Wei", 
-                    details: "University of Waterloo, First Year Systems Design Engineering",
-                    avatar: "https://via.placeholder.com/80x80/4A9FE7/ffffff?text=AW"
-                }
-            ]
-        };
+    const fetchMentors = async (school: string, program: string) => {
+        try {
+            const programKey = `${school}_${program}`;
+            console.log("Fetching mentors for:", programKey);
+            
+            const response = await fetch(`http://localhost:5001/api/program-mentors/${encodeURIComponent(programKey)}`);
+            console.log("Response status:", response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Mentor data received:", data);
+                setProgramMentors(data);
+            } else {
+                console.error("API returned error:", await response.text());
+                setProgramMentors([]); // Empty if not found
+            }
+        } catch (error) {
+            console.error("Error fetching mentors:", error);
+            setProgramMentors([]);
+        }
     };
+
+    useEffect(() => {
+        if (selectedMatch) {
+            fetchMentors(selectedMatch.school, selectedMatch.program);
+        }
+    }, [selectedMatch]);
 
     const downloadPDF = async () => {
         try {
@@ -210,23 +232,35 @@ export default function Matches() {
                             </div>
                             
                             <div className="program-info">
-                                <p>{getMockProgramInfo(selectedMatch.school, selectedMatch.program).description}</p>
+                                <p>Basic info about this program and what makes it unique. This program focuses on innovative approaches to solving complex problems.</p>
                             </div>
                          
                             
                             <div className="mentors-section">
+                                <h3>Connect with Student Mentors</h3>
                                 <div className="mentors-grid">
-                                    {getMockProgramInfo(selectedMatch.school, selectedMatch.program).mentors.map((mentor, index) => (
-                                        <div key={index} className="mentor-card">
-                                            <h4>{mentor.name}</h4>
-                                            <p className="mentor-details">{mentor.details}</p>
-                                            <div 
-                                                className="mentor-avatar"
-                                                style={{ backgroundImage: `url(${mentor.avatar})` }}
-                                            ></div>
-                                            <button className="mentor-button">MentorMe!</button>
-                                        </div>
-                                    ))}
+                                    {programMentors.length > 0 ? (
+                                        programMentors.map((mentor, index) => (
+                                            <div key={index} className="mentor-card">
+                                                <h4>{mentor.name}</h4>
+                                                <p className="mentor-details">{mentor.details}</p>
+                                                <div 
+                                                    className="mentor-avatar"
+                                                    style={{ backgroundImage: `url(${mentor.avatar})` }}
+                                                ></div>
+                                                <a 
+                                                    href={mentor.linkedin} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="mentor-button"
+                                                >
+                                                    MentorMe!
+                                                </a>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p>No mentors available for this program. Check back soon!</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,52 @@
+{
+    "mentors": [
+      {
+        "id": "1",
+        "name": "Anna Wei",
+        "school": "University of Waterloo",
+        "program": "Systems Design Engineering",
+        "year": "Second Year",
+        "details": "University of Waterloo, Second Year Systems Design Engineering",
+        "bio": "Hi! I'm a second-year Systems Design Engineering student passionate about human-centered design and technology. Happy to chat about course selection, co-op opportunities, or campus life!",
+        "avatar": "http://localhost:5001/static/annaHeadshot.jpeg",
+        "linkedin": "https://linkedin.com/in/weianna"
+      },
+      {
+        "id": "2",
+        "name": "Anson Wang",
+        "school": "University of Western",
+        "program": "Computer Science",
+        "year": "Second Year",
+        "details": "University of Western Ontario, Second Year Computer Science",
+        "bio": "CS student focusing on AI and machine learning. I can provide insights on course selection, internships, or general university questions!",
+        "avatar": "http://localhost:5001/static/ansonWangHeadshot.jpeg",
+        "linkedin": "https://linkedin.com/in/ansonwnng"
+      },
+      {
+        "id": "3",
+        "name": "Kevin Li",
+        "school": "University of Western",
+        "program": "Computer Science",
+        "year": "Second Year",
+        "details": "University of Western, Second Year Computer Science",
+        "bio": "I tall i like volleyball and computer science. I can help with course selection, internships, or general university questions!",
+        "avatar": "http://localhost:5001/static/kevinHeadshot.jpeg",
+        "linkedin": "https://linkedin.com/in/kevinli5371"
+      },
+      {
+        "id": "4",
+        "name": "Amanda Xu",
+        "school": "University of Waterloo",
+        "program": "Systems Design Engineering",
+        "year": "Second Year",
+        "details": "University of Waterloo, Second Year Systems Design Engineering",
+        "bio": "Hi! I'm a second-year Systems Design Engineering student passionate about human-centered design and technology. Happy to chat about course selection, co-op opportunities, or campus life!",
+        "avatar": "http://localhost:5001/static/amandaXuHeadshot.jpeg",
+        "linkedin": "https://linkedin.com/in/xu-amanda"
+      }
+    ],
+    "programMentors": {
+      "University of Waterloo_Systems Design Engineering": ["1", "4"],
+      "University of Western Ontario_Computer Science": ["2", "3"]
+    }
+}

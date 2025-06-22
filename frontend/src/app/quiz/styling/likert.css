@@ -1,0 +1,200 @@
+/* Likert Scale Component Styles */
+.likert-container {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e9ecef;
+  --likert-total: 5; /* Default, will be overridden by CSS custom property */
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.likert-question {
+  margin-bottom: 10px;
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  color: white;
+  text-align: center;
+}
+
+.likert-labels {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+}
+
+.likert-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4rem;
+}
+
+.likert-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+  position: relative;
+}
+
+/* Hide the actual radio input */
+.likert-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Style the custom radio button */
+.likert-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+/* Dynamic gradient colors using CSS custom properties and calc() */
+/* Starting purple: hsl(260, 60%, 65%) - A softer, less magenta purple */
+/* Ending blue: hsl(210, 80%, 55%) - A nice medium blue */
+
+/* Calculate the hue transition from purple (260) to blue (210) */
+.likert-option:nth-child(2) {
+  --position: 0;
+}
+.likert-option:nth-child(3) {
+  --position: 1;
+}
+.likert-option:nth-child(4) {
+  --position: 2;
+}
+.likert-option:nth-child(5) {
+  --position: 3;
+}
+.likert-option:nth-child(6) {
+  --position: 4;
+}
+.likert-option:nth-child(7) {
+  --position: 5;
+}
+.likert-option:nth-child(8) {
+  --position: 6;
+}
+.likert-option:nth-child(9) {
+  --position: 7;
+}
+.likert-option:nth-child(10) {
+  --position: 8;
+}
+.likert-option:nth-child(11) {
+  --position: 9;
+}
+.likert-option:nth-child(12) {
+  --position: 10;
+}
+
+/* Dynamic color calculation for any number of options */
+.likert-option {
+  /* Calculate total options (subtract 2 for the labels) */
+  --total-options: calc(var(--likert-total, 5));
+  /* Calculate the progress ratio (0 to 1) */
+  --progress: calc(var(--position, 0) / (var(--total-options) - 1));
+  /* Interpolate hue from 260 (purple) to 210 (blue) */
+  --hue: calc(260 - (50 * var(--progress)));
+  /* Slight saturation increase towards blue end */
+  --saturation: calc(60% + (15% * var(--progress)));
+  /* Slight lightness decrease for better contrast */
+  --lightness: calc(65% - (10% * var(--progress)));
+  
+  /* Generate the color */
+  --button-color: hsl(var(--hue), var(--saturation), var(--lightness));
+}
+
+/* Apply the dynamic color to buttons */
+.likert-option .likert-button {
+  border-color: var(--button-color);
+  color: var(--button-color);
+}
+
+/* Hover effects */
+.likert-option:hover .likert-button {
+  transform: scale(1.05);
+  background-color: color-mix(in srgb, var(--button-color) 10%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--button-color) 30%, transparent);
+}
+
+/* Selected state */
+.likert-option input[type="radio"]:checked + .likert-button {
+  background-color: var(--button-color);
+  color: white;
+  border-color: var(--button-color);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--button-color) 40%, transparent);
+  transform: scale(1.1);
+}
+
+/* Light colors need dark text when selected */
+.likert-option:has(input[type="radio"]:checked) {
+  --text-color: white;
+}
+
+/* Adjust text color for lighter colors (towards blue end) */
+.likert-option:nth-child(n+7) input[type="radio"]:checked + .likert-button {
+  color: var(--text-color, white);
+}
+
+/* Label styling */
+.likert-label {
+  font-size: 12px;
+  text-align: center;
+  color: #666;
+  transition: color 0.2s ease;
+  font-weight: 500;
+}
+
+/* Selected label styling */
+.likert-option input[type="radio"]:checked ~ .likert-label {
+  color: var(--button-color);
+  font-weight: bold;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .likert-button {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .likert-label {
+    font-size: 10px;
+  }
+  
+  .likert-options {
+    gap: 5px;
+  }
+}
+
+/* Fallback for browsers that don't support color-mix */
+@supports not (background-color: color-mix(in srgb, red, blue)) {
+  .likert-option:hover .likert-button {
+    background-color: rgba(150, 150, 200, 0.1);
+    box-shadow: 0 2px 8px rgba(150, 150, 200, 0.3);
+  }
+  
+  .likert-option input[type="radio"]:checked + .likert-button {
+    box-shadow: 0 4px 12px rgba(150, 150, 200, 0.4);
+  }
+}

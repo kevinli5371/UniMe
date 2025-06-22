@@ -2,8 +2,10 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import quizData from './questions.json';
-import './likert.css'; // Import the CSS file
-import './quiz.css'; // Import the CSS file for general styles
+import './styling/likert.css'; // Import the CSS file
+import './styling/quiz.css'; // Import the CSS file for general styles
+import './styling/checkbox.css'; // Import the CSS file for checkbox styles
+import './styling/radio.css'; // Import the CSS file for radio styles
 
 interface QuizOption {
   id: string;
@@ -114,16 +116,17 @@ export default function Quiz() {
 
     // Render checkbox question
     const renderCheckboxQuestion = (question: QuizQuestion) => (
-        <div key={question.id} style={{ marginBottom: '30px' }}>
-            <h3 style={{ marginBottom: '10px', color: '#333' }}>
-                {question.id}. {question.question}
+        <div key={question.id} className="checkbox-container">
+            <h3 className="checkbox-question">
+                {question.question}
             </h3>
-            <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+            
+            <p className="checkbox-selection-info">
                 Select up to {question.maxSelections} option{(question.maxSelections || 0) > 1 ? 's' : ''} 
                 ({getSelectionCount(question.id)}/{question.maxSelections} selected)
             </p>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            <div className="checkbox-grid">
                 {question.options.map((option) => {
                     const isSelected = ((answers[question.id] as string[]) || []).includes(String(option.value));
                     const isDisabled = isCheckboxDisabled(question.id, String(option.value), question.maxSelections || 1);
@@ -131,27 +134,16 @@ export default function Quiz() {
                     return (
                         <label
                             key={option.id}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: '12px',
-                                border: '2px solid',
-                                borderColor: isSelected ? '#70B1D9' : '#ddd',
-                                borderRadius: '6px',
-                                backgroundColor: isSelected ? '#e8f4fd' : 'white',
-                                cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                opacity: isDisabled ? 0.6 : 1,
-                                transition: 'all 0.2s ease'
-                            }}
+                            className="checkbox-option"
                         >
                             <input
                                 type="checkbox"
                                 checked={isSelected}
                                 disabled={isDisabled}
                                 onChange={() => handleCheckboxChange(question.id, String(option.value), question.maxSelections || 1)}
-                                style={{ marginRight: '10px', transform: 'scale(1.2)' }}
                             />
-                            <span style={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
+                            <div className="checkbox-custom"></div>
+                            <span className="checkbox-label-text">
                                 {option.label}
                             </span>
                         </label>
@@ -163,29 +155,19 @@ export default function Quiz() {
 
     // Render radio question
     const renderRadioQuestion = (question: QuizQuestion) => (
-        <div key={question.id} style={{ marginBottom: '30px' }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>
-                {question.id}. {question.question}
+        <div key={question.id} className="radio-container">
+            <h3 className="radio-question">
+                {question.question}
             </h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="radio-options">
                 {question.options.map((option) => {
                     const isSelected = answers[question.id] === String(option.value);
                     
                     return (
                         <label
                             key={option.id}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: '12px',
-                                border: '2px solid',
-                                borderColor: isSelected ? '#28a745' : '#ddd',
-                                borderRadius: '6px',
-                                backgroundColor: isSelected ? '#e8f5e8' : 'white',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
+                            className="radio-option"
                         >
                             <input
                                 type="radio"
@@ -193,9 +175,9 @@ export default function Quiz() {
                                 value={String(option.value)}
                                 checked={isSelected}
                                 onChange={() => handleRadioChange(question.id, String(option.value))}
-                                style={{ marginRight: '10px', transform: 'scale(1.2)' }}
                             />
-                            <span style={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
+                            <div className="radio-custom"></div>
+                            <span className="radio-label-text">
                                 {option.label}
                             </span>
                         </label>
@@ -205,36 +187,43 @@ export default function Quiz() {
         </div>
     );
 
-    const renderLikertQuestion = (question: QuizQuestion) => (
-        <div key={question.id} className="likert-container">
-            <h3 className="likert-question">
-                {/* {question.id}.*/} {question.question}
-            </h3>
-            
-            <div className="likert-options">
-                <p>{question.leftLabel}</p>
-                {question.options.map((option, index) => {
-                    const isSelected = answers[question.id] === String(option.value);
-                    
-                    return (
-                        <label key={option.id} className="likert-option">
-                            <input
-                                type="radio"
-                                name={`question_${question.id}`}
-                                value={String(option.value)}
-                                checked={isSelected}
-                                onChange={() => handleRadioChange(question.id, String(option.value))}
-                            />
-                            <div className="likert-button">
-                                {index + 1}
-                            </div>
-                        </label>
-                    );
-                })}
-                <p>{question.rightLabel}</p>
+    const renderLikertQuestion = (question: QuizQuestion) => {
+        // Calculate the total number of options for dynamic CSS
+        const totalOptions = question.options.length;
+        
+        return (
+            <div 
+                key={question.id} 
+                className="likert-container"
+                style={{ '--likert-total': totalOptions } as React.CSSProperties}
+            >
+                <h3 className="likert-question">
+                    {question.question}
+                </h3>
+                
+                <div className="likert-options">
+                    <p>{question.leftLabel}</p>
+                    {question.options.map((option, index) => {
+                        const isSelected = answers[question.id] === String(option.value);
+                        
+                        return (
+                            <label key={option.id} className="likert-option">
+                                <input
+                                    type="radio"
+                                    name={`question_${question.id}`}
+                                    value={String(option.value)}
+                                    checked={isSelected}
+                                    onChange={() => handleRadioChange(question.id, String(option.value))}
+                                />
+                                <div className="likert-button"></div>
+                            </label>
+                        );
+                    })}
+                    <p>{question.rightLabel}</p>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="quiz-container">
@@ -263,7 +252,7 @@ export default function Quiz() {
                 </div>
             </div>
 
-            <div className="all-questions">
+            <div className="all-questions" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px' }}>
                 {typedQuizData.sections.map(section => (
                     <div key={section.id} className="section-container">
                         {section.questions.map(question => {
@@ -282,7 +271,7 @@ export default function Quiz() {
                 ))}
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <div style={{ textAlign: 'center', marginTop: '40px', maxWidth: '900px', margin: '40px auto 0 auto', padding: '0 20px' }}>
                 <Link href="/matches">
                     <button
                         disabled={!isQuizComplete()}
@@ -315,7 +304,9 @@ export default function Quiz() {
                 padding: '15px', 
                 backgroundColor: '#f8f9fa', 
                 borderRadius: '6px',
-                fontSize: '12px'
+                fontSize: '12px',
+                maxWidth: '900px',
+                margin: '40px auto 0 auto'
             }}>
                 <h4>Current Answers (Debug):</h4>
                 <pre style={{ overflow: 'auto' }}>{JSON.stringify(answers, null, 2)}</pre>

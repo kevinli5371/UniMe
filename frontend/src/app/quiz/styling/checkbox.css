@@ -1,0 +1,161 @@
+/* Checkbox Question Component Styles */
+.checkbox-container {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.checkbox-question {
+  margin-bottom: 10px;
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  color: #333;
+}
+
+.checkbox-selection-info {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.checkbox-grid {
+  display: grid;
+  gridTemplateColumns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 4rem;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 2px solid #e6e1f0; /* Light muted purple border */
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;
+  min-width: fit-content;
+  width: 100%;
+  justify-self: stretch;
+}
+
+/* Hide the actual checkbox input */
+.checkbox-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Style the custom checkbox */
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: transparent;
+  border: 2px solid #d3c9e6; /* Light muted purple */
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Checkbox label text */
+.checkbox-label-text {
+  font-weight: normal;
+  transition: font-weight 0.2s ease;
+  color: #333;
+}
+
+/* Hover effects */
+.checkbox-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #c7b8dd; /* Slightly darker purple on hover */
+}
+
+.checkbox-option:hover .checkbox-custom {
+  border-color: #c7b8dd;
+  transform: scale(1.05);
+}
+
+/* Selected state */
+.checkbox-option:has(input[type="checkbox"]:checked) {
+  border-color: #70B1D9; /* Blue border when selected */
+  background-color: #e8f4fd; /* Light blue background */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(112, 177, 217, 0.3);
+}
+
+.checkbox-option:has(input[type="checkbox"]:checked) .checkbox-custom {
+  background-color: #70B1D9; /* Blue fill */
+  border-color: #70B1D9;
+  transform: scale(1.1);
+}
+
+/* Remove the checkmark icon */
+.checkbox-option:has(input[type="checkbox"]:checked) .checkbox-custom::after {
+  content: "";
+  /* Removed checkmark content */
+}
+
+.checkbox-option:has(input[type="checkbox"]:checked) .checkbox-label-text {
+  font-weight: bold;
+  color: #70B1D9; /* Blue text when selected */
+}
+
+/* Disabled state */
+.checkbox-option:has(input[type="checkbox"]:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox-option:has(input[type="checkbox"]:disabled):hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.checkbox-option:has(input[type="checkbox"]:disabled) .checkbox-custom:hover {
+  transform: none;
+  border-color: #d3c9e6; /* Keep light purple for disabled */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .checkbox-option {
+    padding: 10px;
+    white-space: normal;
+  }
+  
+  .checkbox-custom {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .checkbox-question {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .checkbox-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .checkbox-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,146 @@
+/* Radio Question Component Styles */
+.radio-container {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e9ecef;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.radio-question {
+  margin-bottom: 10px;
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  color: white;
+  text-align: center;
+}
+
+.radio-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 4rem;
+  justify-items: center;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 2px solid #e6e1f0; /* Light muted purple border */
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;
+  min-width: fit-content;
+  width: 100%;
+  justify-self: stretch;
+}
+
+/* Hide the actual radio input */
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Style the custom radio button */
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid #d3c9e6; /* Light muted purple */
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Radio label text */
+.radio-label-text {
+  font-weight: normal;
+  transition: font-weight 0.2s ease;
+  color: #333;
+}
+
+/* Hover effects */
+.radio-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #c7b8dd; /* Slightly darker purple on hover */
+}
+
+.radio-option:hover .radio-custom {
+  border-color: #c7b8dd;
+  transform: scale(1.05);
+}
+
+/* Selected state */
+.radio-option:has(input[type="radio"]:checked) {
+  border-color: #70B1D9; /* Blue border when selected */
+  background-color: #e8f4fd; /* Light blue background */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(112, 177, 217, 0.3);
+}
+
+.radio-option:has(input[type="radio"]:checked) .radio-custom {
+  background-color: #70B1D9; /* Blue fill */
+  border-color: #70B1D9;
+  transform: scale(1.1);
+}
+
+.radio-option:has(input[type="radio"]:checked) .radio-custom::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white; /* White dot in center */
+}
+
+.radio-option:has(input[type="radio"]:checked) .radio-label-text {
+  font-weight: bold;
+  color: #70B1D9; /* Blue text when selected */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .radio-options {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .radio-option {
+    padding: 10px;
+    white-space: normal;
+  }
+  
+  .radio-custom {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .radio-question {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .radio-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .radio-options {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

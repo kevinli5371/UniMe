@@ -150,7 +150,8 @@ def match_api():
         print("Request received!")  # Debug print
         data = request.json
         print("Received data:", data)  # Debug print
-        return jsonify({"message": "Success!", "data": data})
+        matches = compute_matches(data)
+        return jsonify(matches)
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 500

@@ -304,17 +304,12 @@ export default function Quiz() {
                     Submit Quiz
                 </button>
             {/* Debug section */}
-            <div style={{ 
-                marginTop: '40px', 
-                padding: '15px', 
-                backgroundColor: '#f8f9fa', 
-                borderRadius: '6px',
-                fontSize: '12px',
-                maxWidth: '900px',
-                margin: '40px auto 0 auto'
-            }}>
-                <h4>Current Answers (Debug):</h4>
-                <pre style={{ overflow: 'auto' }}>{JSON.stringify(answers, null, 2)}</pre>
+            <div>
+            {/* Add padding to the debug section */}
+            <div style={{ padding: '40px' }}>
+                {/* Debug info (optional): */}
+                {/* <pre>{JSON.stringify(answers, null, 2)}</pre> */}
+            </div>
             </div>
         </div>
     </div>

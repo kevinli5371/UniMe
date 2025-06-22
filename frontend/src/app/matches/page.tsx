@@ -1,43 +1,45 @@
 "use client";
-
-import response from '../test.json';
+import { useState, useEffect } from 'react';
 import './matches.css';
-import { useState } from 'react';
 
 interface Match {
     school: string;
     program: string;
-    overall: string;
-    academic: string;
-    social: string;
-    campus: string;
+    overall: number;
+    academic: number;
+    campus: number;
+    social: number;
 }
 
 export default function Matches() {
+    const [matches, setMatches] = useState<Match[]>([]);
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
+    useEffect(() => {
+        const data = localStorage.getItem("matches");
+        if (data) setMatches(JSON.parse(data));
+    }, []);
+
     function handleClick(match: Match) {
-        console.log("Match clicked");
         setSelectedMatch(match);
     }
 
     return (
         <div className="matches-container">
             <div className="match-list">
-                {response.data.map((match: Match, index: number) => (
-                    <div key={index + 1} className="match" onClick={() => handleClick(match)}>
+                {matches.map((match, index) => (
+                    <div key={index} className="match" onClick={() => handleClick(match)}>
                         <p>{match.school}</p>
                         <p>{match.program}</p>
-                        <p>Overall: {match.overall}</p>
+                        <p>Overall: {match.overall.toFixed(3)}</p>
                     </div>
                 ))}
             </div>
-
             {selectedMatch && (
                 <div className="popup">
-                    <p>Academic: {selectedMatch.academic}</p>
-                    <p>Social: {selectedMatch.social}</p>
-                    <p>Campus: {selectedMatch.campus}</p>
+                    <p>Academic: {selectedMatch.academic.toFixed(3)}</p>
+                    <p>Social: {selectedMatch.social.toFixed(3)}</p>
+                    <p>Campus: {selectedMatch.campus.toFixed(3)}</p>
                 </div>
             )}
         </div>

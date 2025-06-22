@@ -1,5 +1,9 @@
 /* Checkbox Question Component Styles */
 .checkbox-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 2rem;
   border-bottom: 1px solid #e9ecef;
 }
@@ -8,7 +12,7 @@
   margin-bottom: 10px;
   font-size: 2rem;
   margin-bottom: 4rem;
-  color: #333;
+  /* color: #333; */
 }
 
 .checkbox-selection-info {

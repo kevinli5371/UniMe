@@ -1,5 +1,13 @@
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
 .home {
     width: 100vw;
+    background: url('./background.PNG') no-repeat center calc(-20vh);
+    opacity: 0.7;
+    background-size: cover;
 }
 
 .content {
@@ -25,7 +33,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #1a1a1a; /* Optional: different background */
+    /* background-color: #1a1a1a; */
 }
 
 .chanceme {
@@ -37,14 +45,84 @@
     justify-content: center;
 }
 
-
-.text{
+/* Animation setup - elements start invisible and offset */
+.text {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+.button-container {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition-delay: 0.3s;
+}
+
+/* Individual text element animations */
+.text h1 {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition-delay: 0.2s;
+    color: white;
+    font-weight: bold;
+    font-size: 5rem;
+}
+
+.text p {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition-delay: 0.1s;
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 300;
+}
+
+/* Animation states when elements come into view */
+.animate-in .text {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.animate-in .button-container {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.animate-in .text h1,
+.animate-in .text p {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Landing section gets immediate animation on page load */
+.landing .text,
+.landing .button-container {
+    animation: fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.landing .button-container {
+    animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(60px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button styling with enhanced hover effects */
 .home button {
     background-color: #36A8B4;
     border: none;
@@ -57,25 +135,22 @@
     font-weight: bold;
     font-size: 1.5rem;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .home button:hover {
     background-color: #2a7f8c;
-    transition: ease-in-out 0.15s;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(54, 168, 180, 0.3);
 }
 
-.home p {
-    color: white;
-    font-size: 1.75rem;
-    font-weight: 300;
+/* Enhanced hover effects for text */
+.text h1:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
 }
 
-.home h1 {
-    color: white;
-    font-weight: bold;
-    font-size: 5rem;
-}
-
+/* Section-specific styling */
 .matchme p, .chanceme p {
     width: 43%;
     text-align: center;
@@ -84,4 +159,30 @@
 .matchme button, .chanceme button {
     width: 16rem;
     height: 4rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .text h1 {
+        font-size: 3rem;
+    }
+    
+    .text p {
+        font-size: 1.25rem;
+        width: 80%;
+    }
+    
+    .matchme p, .chanceme p {
+        width: 80%;
+    }
+    
+    .home button {
+        width: 10rem;
+        height: 3.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .matchme button, .chanceme button {
+        width: 14rem;
+    }
 }

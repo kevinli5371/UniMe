@@ -42,7 +42,7 @@ export default function Home() {
             <Link href="/quiz">
               <button className="button">MatchMe</button>
             </Link>
-            <Link href="/matches">
+            <Link href="/chance">
               <button className="button">ChanceMe</button>
             </Link>
           </div>

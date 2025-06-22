@@ -15,7 +15,7 @@ interface QuizOption {
 }
 
 interface QuizQuestion {
-  id: number;
+  id: string;
   question: string;
   type: string;
   options: QuizOption[];
@@ -28,7 +28,7 @@ interface QuizQuestion {
   defaultValue?: number;
   placeholder?: string;
   conditional?: {
-    dependsOn: number;
+    dependsOn: string;
     requiredValue: string;
   };
 }
@@ -48,10 +48,10 @@ interface QuizData {
 const typedQuizData = quizData as QuizData;
 
 export default function Quiz() {
-    const [answers, setAnswers] = useState<Record<number, string[] | string | number>>({});
+    const [answers, setAnswers] = useState<Record<string, string[] | string | number>>({});
     const router = useRouter();
 
-    const handleCheckboxChange = (questionId: number, optionValue: string, maxSelections: number) => {
+    const handleCheckboxChange = (questionId: string, optionValue: string, maxSelections: number) => {
         setAnswers((prevAnswers) => {
             const currentSelections = (prevAnswers[questionId] as string[]) || [];
             if (currentSelections.includes(optionValue)) {
@@ -70,7 +70,7 @@ export default function Quiz() {
     };
 
     // Handle radio and likert questions
-    const handleRadioChange = (questionId: number, optionValue: string) => {
+    const handleRadioChange = (questionId: string, optionValue: string) => {
         setAnswers(prev => ({
             ...prev,
             [questionId]: optionValue
@@ -78,7 +78,7 @@ export default function Quiz() {
     };
 
     // Handle number input questions
-    const handleNumberChange = (questionId: number, value: number) => {
+    const handleNumberChange = (questionId: string, value: number) => {
         setAnswers(prev => ({
             ...prev,
             [questionId]: value
@@ -86,13 +86,13 @@ export default function Quiz() {
     };
 
     // Check if checkbox option should be disabled
-    const isCheckboxDisabled = (questionId: number, optionValue: string, maxSelections: number) => {
+    const isCheckboxDisabled = (questionId: string, optionValue: string, maxSelections: number) => {
         const currentSelections = (answers[questionId] as string[]) || [];
         return currentSelections.length >= maxSelections && !currentSelections.includes(optionValue);
     };
 
     // Get selection count for checkboxes
-    const getSelectionCount = (questionId: number) => {
+    const getSelectionCount = (questionId: string) => {
         const selections = answers[questionId] as string[];
         return selections?.length || 0;
     };
@@ -287,7 +287,7 @@ export default function Quiz() {
 
             <div style={{ textAlign: 'center', marginTop: '40px' }}>
                 <button
-                    disabled={!true}
+                    disabled={!isQuizComplete()}
                     onClick={handleSubmit}
                     style={{
                         padding: '15px 30px',

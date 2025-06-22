@@ -4,7 +4,7 @@ import json
 from match_me import INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, enhanced_interest_score, enhanced_course_score
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:3000"])
 
 with open('backend/program_profiles.json', 'r', encoding='utf-8') as f:
     programs = json.load(f)
@@ -143,10 +143,8 @@ def compute_matches(answers):
     results.sort(key=lambda x: x["overall"], reverse=True)
     return results[:10]
 
-if __name__ == "__main__":
-    app.run(port=5000, debug=True)  # Explicitly run the Flask app
 
-@app.route('/api/match', methods=['POST', 'OPTIONS'])
+@app.route('/api/match', methods=['POST'])
 def match_api():
     try:
         print("Request received!")  # Debug print
@@ -158,5 +156,5 @@ def match_api():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    print("Starting Flask server on port 5000...")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print("Starting Flask server on port 5001...")
+    app.run(host='0.0.0.0', port=5001, debug=True)

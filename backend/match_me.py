@@ -14,6 +14,7 @@ Outputs the top 10 matches with scores.
 """
 import json
 from tqdm import tqdm
+import sys
 
 # Load program profiles
 try:

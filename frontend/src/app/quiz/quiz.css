@@ -1,3 +1,10 @@
+.quiz-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .header {
     display: flex;
     flex-direction: column;
@@ -145,4 +152,9 @@
     font-size: 1.5rem;
     outline: none;
     box-shadow: none;
+}
+
+.all-questions {
+    /* border: 2px solid white; */
+    width: 80%;
 }

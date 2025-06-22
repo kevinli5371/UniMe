@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import quizData from './questions.json';
-import './quiz.css';
+import './likert.css'; // Import the CSS file
+import './quiz.css'; // Import the CSS file for general styles
 
 interface QuizOption {
   id: string;
@@ -135,7 +136,7 @@ export default function Quiz() {
                                 alignItems: 'center',
                                 padding: '12px',
                                 border: '2px solid',
-                                borderColor: isSelected ? '#007bff' : '#ddd',
+                                borderColor: isSelected ? '#70B1D9' : '#ddd',
                                 borderRadius: '6px',
                                 backgroundColor: isSelected ? '#e8f4fd' : 'white',
                                 cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -204,79 +205,39 @@ export default function Quiz() {
         </div>
     );
 
-    // Render likert scale question
     const renderLikertQuestion = (question: QuizQuestion) => (
-        <div key={question.id} className="question-container">
-            <h3>
-                {question.id}. {question.question}
+        <div key={question.id} className="likert-container">
+            <h3 className="likert-question">
+                {/* {question.id}.*/} {question.question}
             </h3>
             
-            <div className="scale-labels">
-                <span>{question.leftLabel}</span>
-                <span>{question.rightLabel}</span>
-            </div>
-            
-            <div className="likert-scale">
+            <div className="likert-options">
+                <p>{question.leftLabel}</p>
                 {question.options.map((option, index) => {
                     const isSelected = answers[question.id] === String(option.value);
                     
                     return (
-                        <label
-                            key={option.id}
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                flex: 1
-                            }}
-                        >
+                        <label key={option.id} className="likert-option">
                             <input
                                 type="radio"
                                 name={`question_${question.id}`}
                                 value={String(option.value)}
                                 checked={isSelected}
                                 onChange={() => handleRadioChange(question.id, String(option.value))}
-                                style={{ 
-                                    marginBottom: '5px', 
-                                    transform: 'scale(1.3)',
-                                    accentColor: '#007bff'
-                                }}
                             />
-                            <div
-                                style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    backgroundColor: isSelected ? '#007bff' : '#e9ecef',
-                                    color: isSelected ? 'white' : '#666',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 'bold',
-                                    fontSize: '16px',
-                                    transition: 'all 0.2s ease'
-                                }}
-                            >
+                            <div className="likert-button">
                                 {index + 1}
                             </div>
-                            <span style={{ 
-                                fontSize: '12px', 
-                                textAlign: 'center', 
-                                marginTop: '5px',
-                                color: isSelected ? '#007bff' : '#666'
-                            }}>
-                                {option.label}
-                            </span>
                         </label>
                     );
                 })}
+                <p>{question.rightLabel}</p>
             </div>
         </div>
     );
 
     return (
-        <div>
+        <div className="quiz-container">
             <div className="header">
                 <h1>get matched for free</h1>
                 <p className="subtext">Based on Ontario University Data</p>
@@ -302,32 +263,24 @@ export default function Quiz() {
                 </div>
             </div>
 
-            {typedQuizData.sections.map(section => (
-                <div key={section.id} style={{ marginBottom: '50px' }}>
-                    <h2 style={{ 
-                        fontSize: '24px', 
-                        color: '#007bff', 
-                        borderBottom: '2px solid #007bff', 
-                        paddingBottom: '10px',
-                        marginBottom: '30px'
-                    }}>
-                        {section.title}
-                    </h2>
-                    
-                    {section.questions.map(question => {
-                        switch (question.type) {
-                            case 'checkbox':
-                                return renderCheckboxQuestion(question);
-                            case 'radio':
-                                return renderRadioQuestion(question);
-                            case 'likert':
-                                return renderLikertQuestion(question);
-                            default:
-                                return null;
-                        }
-                    })}
-                </div>
-            ))}
+            <div className="all-questions">
+                {typedQuizData.sections.map(section => (
+                    <div key={section.id} className="section-container">
+                        {section.questions.map(question => {
+                            switch (question.type) {
+                                case 'checkbox':
+                                    return renderCheckboxQuestion(question);
+                                case 'radio':
+                                    return renderRadioQuestion(question);
+                                case 'likert':
+                                    return renderLikertQuestion(question);
+                                default:
+                                    return null;
+                            }
+                        })}
+                    </div>
+                ))}
+            </div>
 
             <div style={{ textAlign: 'center', marginTop: '40px' }}>
                 <Link href="/matches">

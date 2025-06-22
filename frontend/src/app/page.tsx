@@ -66,7 +66,7 @@ export default function Home() {
             <p>Only 3 minutes, estimate your chances of getting into your dream university program</p>
           </div>
           <div className="button-container">
-            <Link href="/quiz">
+            <Link href="/chance">
               <button className="button">Take the test  →  </button>
             </Link>
           </div>

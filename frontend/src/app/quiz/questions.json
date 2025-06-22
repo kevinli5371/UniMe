@@ -7,7 +7,7 @@
       "description": "Rate how much each factor matters to you (they will be normalized)",
       "questions": [
         {
-          "id": 1,
+          "id": "wa",
           "question": "Academics value",
           "type": "likert",
           "scale": 10,
@@ -28,7 +28,7 @@
           ]
         },
         {
-          "id": 2,
+          "id": "wc",
           "question": "Campus life value",
           "type": "likert",
           "scale": 10,
@@ -49,7 +49,7 @@
           ]
         },
         {
-          "id": 3,
+          "id": "wso",
           "question": "Social value",
           "type": "likert",
           "scale": 10,
@@ -72,11 +72,11 @@
       ]
     },
     {
-      "id": "academics",
+      "id": 1,
       "title": "Academics",
       "questions": [
         {
-          "id": 4,
+          "id": "AA",
           "question": "Pick up to three broad academic interests",
           "type": "checkbox",
           "maxSelections": 3,
@@ -91,7 +91,7 @@
           ]
         },
         {
-          "id": 5,
+          "id": "LS",
           "question": "How do you prefer to learn?",
           "type": "likert",
           "scale": 5,
@@ -107,7 +107,7 @@
           ]
         },
         {
-          "id": 6,
+          "id": "SP",
           "question": "How specialized should 1st-year be?",
           "type": "likert",
           "scale": 5,
@@ -123,7 +123,7 @@
           ]
         },
         {
-          "id": 7,
+          "id": "CO",
           "question": "How critical is co-op/internship?",
           "type": "likert",
           "scale": 5,
@@ -139,7 +139,7 @@
           ]
         },
         {
-          "id": 8,
+          "id": "UR",
           "question": "Undergraduate research importance?",
           "type": "likert",
           "scale": 5,
@@ -155,7 +155,7 @@
           ]
         },
         {
-          "id": 9,
+          "id": "CR",
           "question": "Are you creative?",
           "type": "likert",
           "scale": 5,
@@ -171,7 +171,7 @@
           ]
         },
         {
-          "id": 10,
+          "id": "CE",
           "question": "Career certainty?",
           "type": "likert",
           "scale": 5,
@@ -187,7 +187,7 @@
           ]
         },
         {
-          "id": 11,
+          "id": "LC",
           "question": "What HS courses did you like?",
           "type": "checkbox",
           "maxSelections": 5,
@@ -206,7 +206,7 @@
           ]
         },
         {
-          "id": 12,
+          "id": "ME",
           "question": "Math enjoyment?",
           "type": "likert",
           "scale": 5,
@@ -222,7 +222,7 @@
           ]
         },
         {
-          "id": 13,
+          "id": "CP",
           "question": "Collaboration preference?",
           "type": "likert",
           "scale": 5,
@@ -238,7 +238,7 @@
           ]
         },
         {
-          "id": 14,
+          "id": "ALT",
           "question": "If not Engineering, alternatives?",
           "type": "checkbox",
           "maxSelections": 5,
@@ -271,7 +271,7 @@
       "title": "Campus Life",
       "questions": [
         {
-          "id": 15,
+          "id": "CSB",
           "question": "Ideal class size?",
           "type": "radio",
           "options": [
@@ -281,7 +281,7 @@
           ]
         },
         {
-          "id": 16,
+          "id": "SET",
           "question": "Campus setting you'd enjoy most?",
           "type": "radio",
           "options": [
@@ -292,7 +292,7 @@
           ]
         },
         {
-          "id": 17,
+          "id": "HS",
           "question": "Preferred first-year housing style",
           "type": "checkbox",
           "maxSelections": 4,
@@ -304,7 +304,7 @@
           ]
         },
         {
-          "id": 18,
+          "id": "CPS",
           "question": "Preferred campus size?",
           "type": "radio",
           "options": [
@@ -316,11 +316,11 @@
       ]
     },
     {
-      "id": "social",
+      "id": 19,
       "title": "Social & Extracurriculars",
       "questions": [
         {
-          "id": 19,
+          "id": "NS",
           "question": "Night-and-weekend scene?",
           "type": "likert",
           "scale": 5,
@@ -336,7 +336,7 @@
           ]
         },
         {
-          "id": 20,
+          "id": "SPT",
           "question": "Which varsity/rec sports?",
           "type": "checkbox",
           "maxSelections": 7,
@@ -351,7 +351,7 @@
           ]
         },
         {
-          "id": 21,
+          "id": "CLB",
           "question": "Which clubs interest you?",
           "type": "checkbox",
           "maxSelections": 6,
@@ -365,7 +365,7 @@
           ]
         },
         {
-          "id": 22,
+          "id": "CEV",
           "question": "Cultural events attendance?",
           "type": "likert",
           "scale": 5,

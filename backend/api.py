@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 import datetime
 from match_me import INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, enhanced_interest_score, enhanced_course_score
+from chanceMe import predict_admission_chance
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
@@ -144,8 +145,6 @@ def compute_matches(answers, num_results=10):
     results.sort(key=lambda x: x["overall"], reverse=True)
     return results[:num_results]
 
-
-
 @app.route('/api/match', methods=['POST'])
 def match_api():
     try:
@@ -157,6 +156,48 @@ def match_api():
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/chance-me', methods=['POST'])
+def chance_me_api():
+    try:
+        print("ChanceMe request received!")  # Debug print
+        data = request.json
+        print("Received ChanceMe data:", data)  # Debug print
+        
+        # Extract data from request
+        university = data.get('school', '')
+        program = data.get('program', '')
+        top6_avg = float(data.get('top6', 0))
+        ecs_input = data.get('ecs', '')
+        
+        # Parse ECs (split by comma and clean up)
+        ecs = []
+        if ecs_input:
+            ecs = [ec.strip() for ec in ecs_input.split(',') if ec.strip()]
+        
+        # Path to CSV file (adjust this path as needed)
+        csv_path = 'backend/admissionsData.csv'
+        
+        # Get prediction
+        result = predict_admission_chance(csv_path, university, program, top6_avg, ecs)
+        
+        return jsonify({
+            "success": True,
+            "prediction": result,
+            "inputs": {
+                "university": university,
+                "program": program,
+                "top6_average": top6_avg,
+                "extracurriculars": ecs
+            }
+        })
+        
+    except Exception as e:
+        print("ChanceMe Error:", str(e))
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 @app.route('/api/download-pdf', methods=['POST'])
 def download_pdf():
@@ -206,4 +247,3 @@ def get_full_matches():
 if __name__ == '__main__':
     print("Starting Flask server on port 5001...")
     app.run(host='0.0.0.0', port=5001, debug=True)
-

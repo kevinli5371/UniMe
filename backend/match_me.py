@@ -13,7 +13,6 @@ Usage:
 Outputs the top 10 matches with scores.
 """
 import json
-import sys
 from tqdm import tqdm
 
 # Load program profiles
@@ -154,30 +153,6 @@ INTEREST_DESCRIPTIONS = {
     "Undecided": "Not sure yet or interested in multiple areas"
 }
 
-# Helper for multi-select input with descriptions
-def multi_select(prompt, options, descriptions=None):
-    print(f"{prompt} (separate choices by comma)")
-    for i, opt in enumerate(options, 1):
-        desc = f" - {descriptions[opt]}" if descriptions and opt in descriptions else ""
-        print(f"  {i}. {opt}{desc}")
-    choices = input("Enter numbers: ")
-    selected = set()
-    for token in choices.split(','):
-        token = token.strip()
-        if token.isdigit() and 1 <= int(token) <= len(options):
-            selected.add(options[int(token)-1])
-    return selected
-
-# Helper for single-select input
-def single_select(prompt, options):
-    print(f"{prompt}")
-    for i, opt in enumerate(options, 1):
-        print(f"  {i}. {opt}")
-    choice = input("Enter number: ")
-    if choice.isdigit() and 1 <= int(choice) <= len(options):
-        return options[int(choice)-1]
-    return None
-
 # Enhanced interest matching using mappings
 def enhanced_interest_score(user_interests, program_interests):
     """Calculate interest score with mapping to standardized categories"""
@@ -238,75 +213,38 @@ def enhanced_course_score(user_courses, program_courses):
     match_ratio = len(mapped_program_courses) / max(len(user_courses), 1)
     return min(match_ratio, 1.0)  # Cap at 1.0
 
-# Ask weights
-print("Rate how much each factor matters to you (they will be normalized):")
-wa = float(input("Academics weight (e.g. 1): ") or 1)
-wc = float(input("Campus life weight  (e.g. 1): ") or 1)
-wso = float(input("Social weight       (e.g. 1): ") or 1)
-W_TOTAL = wa + wc + wso
-
-# Academic questions
-print("\n--- Academics ---")
-AA = multi_select("Pick up to three broad academic interests", ["Engineering","CS/Math","Business","Arts/Humanities","Sciences","Health","Undecided"], INTEREST_DESCRIPTIONS)
-LS = int(input("How do you prefer to learn? (1=Theoretical ... 5=Hands-on): ") or 3)
-SP = int(input("How specialized should 1st-year be? (1=Very broad ... 5=Highly specialized): ") or 3)
-CO = int(input("How critical is co-op/internship? (1=Not important ... 5=Essential): ") or 3)
-UR = int(input("Undergraduate research importance? (1=Not at all ... 5=Essential): ") or 3)
-CR = int(input("Are you creative? (1=Not creative ... 5=Very creative): ") or 3)
-CE = int(input("Career certainty? (1=Not sure ... 5=Very sure): ") or 3)
-LC = multi_select("What HS courses did you like?", ["Autoshop","Biology","Business","Chemistry","Computer Science","Geography","History","Language Arts","Math","Physics","Visual Arts"])
-ME = int(input("Math enjoyment? (1=Hate ... 5=Love): ") or 3)
-CP = int(input("Collaboration preference? (1=Alone ... 5=Group): ") or 3)
-ALT = []
-if "Engineering" in AA:
-    ALT = list(multi_select("If not Eng, alternatives?", ["Applied Science","Business","Computer Science","Economics","English Literature","Environmental Studies","Finance","Geography","Graphic Design","Health Studies","Marketing","Math","Political Science","Psychology","Visual Arts"]))
-
-# Campus questions
-print("\n--- Campus Life ---")
-CSB = single_select("Ideal class size?", ["< 60","60-200","200+"])
-SET = single_select("Campus setting you'd enjoy most?", ["Urban","Suburban","Small-town","Rural"])
-HS = set(multi_select("Preferred first-year housing style", ["Traditional dorm","Suite-style","Apartment","Off-campus"]))
-CPS = single_select("Preferred campus size?", ["Small","Medium","Large"])
-
-# Social questions
-print("\n--- Social & Extracurriculars ---")
-NS = int(input("Night-and-weekend scene? (1=Quiet ... 5=Very lively): ") or 3)
-SPT = multi_select("Which varsity/rec sports?", ["Basketball","Soccer","Hockey","Rugby","Volleyball","Football","None"])
-CLB = multi_select("Which clubs interest you?", ["Hackathons","Case comps","Design teams","Performing arts","Volunteering","Entrepreneurship"])
-CEV = int(input("How often attend concerts/cultural events? (1=Never ... 5=Very often): ") or 3)
-
 # Scoring functions
 from math import fabs
 
-def score_academic(p):
+def score_academic(p, user_answers):
     # interests (weighted 40%)
     prog_int = p['academic']['interests']
-    i_score = enhanced_interest_score(AA, prog_int) * 0.4
+    i_score = enhanced_interest_score(user_answers['AA'], prog_int) * 0.4
     
     # courses (weighted 20%)
     prog_lc = p['academic'].get('liked_hs_courses', [])
-    lc_score = enhanced_course_score(LC, prog_lc) * 0.2
+    lc_score = enhanced_course_score(user_answers['LC'], prog_lc) * 0.2
     
     # alt (weighted 10% if engineering interest)
     prog_alt = set(p['academic'].get('alt_to_engineering', []))
     alt_score = 0
-    if ALT:
-        matched_alts = prog_alt.intersection(set(ALT))
-        alt_score = (len(matched_alts) / max(len(ALT), 1)) * 0.1
+    if user_answers['ALT']:
+        matched_alts = prog_alt.intersection(set(user_answers['ALT']))
+        alt_score = (len(matched_alts) / max(len(user_answers['ALT']), 1)) * 0.1
     
     # numeric (weighted 30%)
     keys = ['learning_style', 'first_year_specialization', 'coop_importance', 
             'research_importance', 'creativity_orientation', 'career_certainty', 
             'math_enjoyment', 'collaboration_preference']
-    vals = [LS, SP, CO, UR, CR, CE, ME, CP]
+    vals = [user_answers['LS'], user_answers['SP'], user_answers['CO'], user_answers['UR'], user_answers['CR'], user_answers['CE'], user_answers['ME'], user_answers['CP']]
     
     # Adjust weight based on importance
     weights = {
         'learning_style': 1.2,
         'first_year_specialization': 1.0,
-        'coop_importance': 1.5 if CO >= 4 else 1.0,  # Boost if user cares about co-op
-        'research_importance': 1.5 if UR >= 4 else 1.0,  # Boost if user cares about research
-        'creativity_orientation': 1.2 if CR >= 4 else 1.0,
+        'coop_importance': 1.5 if user_answers['CO'] >= 4 else 1.0,  # Boost if user cares about co-op
+        'research_importance': 1.5 if user_answers['UR'] >= 4 else 1.0,  # Boost if user cares about research
+        'creativity_orientation': 1.2 if user_answers['CR'] >= 4 else 1.0,
         'career_certainty': 1.0,
         'math_enjoyment': 1.3,  # Math is important for many programs
         'collaboration_preference': 1.0
@@ -329,33 +267,33 @@ def score_academic(p):
     
     return i_score + lc_score + num_score + alt_score
 
-def score_campus(p):
+def score_campus(p, user_answers):
     base = p['campus']
     scores = []
     
     # Class size (weighted 25%)
-    if base.get('class_size_bin') == CSB:
+    if base.get('class_size_bin') == user_answers['CSB']:
         scores.append(1.0)
     else:
         # Partial credit for close sizes
-        if CSB == "< 60" and base.get('class_size_bin') == "60-200":
+        if user_answers['CSB'] == "< 60" and base.get('class_size_bin') == "60-200":
             scores.append(0.5)
-        elif CSB == "200+" and base.get('class_size_bin') == "60-200":
+        elif user_answers['CSB'] == "200+" and base.get('class_size_bin') == "60-200":
             scores.append(0.5)
         else:
             scores.append(0.0)
     
     # Setting (weighted 25%)
-    if base.get('setting') == SET:
+    if base.get('setting') == user_answers['SET']:
         scores.append(1.0)
     else:
         # Partial credit for related settings
         urban_suburban = {"Urban", "Suburban"}
         rural_small = {"Small-town", "Rural"}
         
-        if SET in urban_suburban and base.get('setting') in urban_suburban:
+        if user_answers['SET'] in urban_suburban and base.get('setting') in urban_suburban:
             scores.append(0.5)
-        elif SET in rural_small and base.get('setting') in rural_small:
+        elif user_answers['SET'] in rural_small and base.get('setting') in rural_small:
             scores.append(0.5)
         else:
             scores.append(0.0)
@@ -364,18 +302,18 @@ def score_campus(p):
     hs_prog = set(base.get('housing_styles', []))
     if hs_prog:
         # How many of the user's preferences are available
-        housing_score = len(HS.intersection(hs_prog)) / len(HS) if HS else 0
+        housing_score = len(user_answers['HS'].intersection(hs_prog)) / len(user_answers['HS']) if user_answers['HS'] else 0
         scores.append(housing_score)
     else:
         scores.append(0.0)
     
     # Campus size (weighted 25%)
-    if base.get('campus_size') == CPS:
+    if base.get('campus_size') == user_answers['CPS']:
         scores.append(1.0)
     else:
         # Partial credit for close sizes
         sizes = ["Small", "Medium", "Large"]
-        user_idx = sizes.index(CPS) if CPS in sizes else -1
+        user_idx = sizes.index(user_answers['CPS']) if user_answers['CPS'] in sizes else -1
         prog_idx = sizes.index(base.get('campus_size')) if base.get('campus_size') in sizes else -1
         
         if user_idx != -1 and prog_idx != -1:
@@ -387,79 +325,50 @@ def score_campus(p):
     # Average all scores with equal weighting
     return sum(scores) / len(scores)
 
-def score_social(p):
+def score_social(p, user_answers):
     base = p['social']
     
     # Night scene similarity (weighted 25%)
     prog_ns = base.get('night_scene', 3)
     # Closer values score higher (5 point scale, max difference is 4)
-    ns_score = 1 - (abs(prog_ns - NS) / 4.0)
+    ns_score = 1 - (abs(prog_ns - user_answers['NS']) / 4.0)
     
     # Sports (weighted 25%)
     sp_prog = set(base.get('sports', []))
-    if "None" in SPT:
+    if "None" in user_answers['SPT']:
         # User doesn't care about sports
         spt_score = 1.0
     else:
         # Calculate match between user preferences and available sports
-        spt_score = len(sp_prog.intersection(SPT)) / max(len(SPT), 1)
+        spt_score = len(sp_prog.intersection(user_answers['SPT'])) / max(len(user_answers['SPT']), 1)
     
     # Clubs (weighted 25%)
     cl_prog = set(base.get('clubs', []))
     # Calculate match between user preferences and available clubs
-    cl_score = len(cl_prog.intersection(CLB)) / max(len(CLB), 1) if CLB else 0.5
+    cl_score = len(cl_prog.intersection(user_answers['CLB'])) / max(len(user_answers['CLB']), 1) if user_answers['CLB'] else 0.5
     
     # Cultural events frequency (weighted 25%)
     prog_cev = base.get('cultural_event_freq', 3)
     # Closer values score higher (5 point scale, max difference is 4)
-    cev_score = 1 - (abs(prog_cev - CEV) / 4.0)
+    cev_score = 1 - (abs(prog_cev - user_answers['CEV']) / 4.0)
     
     # Average all scores with equal weighting
     return (ns_score + spt_score + cl_score + cev_score) / 4
 
 # Compute and rank
-results = []
-for p in tqdm(programs, desc="Scoring programs"):
-    try:
-        a = score_academic(p)
-        c = score_campus(p)
-        sos = score_social(p)
-        total = (wa*a + wc*c + wso*sos) / W_TOTAL
-        results.append((total, a, c, sos, p['uni'], p['program']))
-    except Exception as e:
-        print(f"Error scoring {p.get('uni', 'Unknown')} - {p.get('program', 'Unknown')}: {e}")
+def compute_matches(user_answers):
+    results = []
+    for p in tqdm(programs, desc="Scoring programs"):
+        try:
+            a = score_academic(p, user_answers)
+            c = score_campus(p, user_answers)
+            sos = score_social(p, user_answers)
+            total = (user_answers['wa']*a + user_answers['wc']*c + user_answers['wso']*sos) / (user_answers['W_TOTAL'] or 1)
+            results.append((total, a, c, sos, p['uni'], p['program']))
+        except Exception as e:
+            print(f"Error scoring {p.get('uni', 'Unknown')} - {p.get('program', 'Unknown')}: {e}")
 
-results.sort(reverse=True, key=lambda x: x[0])
-
-print("\nTop 10 Matches:\n")
-for rank, (tot, a, c, soc, uni, prog) in enumerate(results[:10], 1):
-    print(f"{rank}. {uni} – {prog}")
-    print(f"   Total Score: {tot:.3f}  (A={a:.3f}, C={c:.3f}, S={soc:.3f})")
-
-# Display breakdown of top match
-if results:
-    print("\nBreakdown of your top match:")
-    top = results[0]
-    print(f"{top[4]} – {top[5]}")
-    
-    # Find the program object
-    top_program = None
-    for p in programs:
-        if p['uni'] == top[4] and p['program'] == top[5]:
-            top_program = p
-            break
-            
-    if top_program:
-        print("Academic interests that matched yours:")
-        for interest in top_program['academic']['interests']:
-            for category in AA:
-                mapped = False
-                for key_term in INTEREST_MAPPINGS:
-                    if key_term in interest.lower() and INTEREST_MAPPINGS[key_term] == category:
-                        print(f"  • {interest} (matched with your {category} interest)")
-                        mapped = True
-                        break
-                if mapped:
-                    break
+    results.sort(reverse=True, key=lambda x: x[0])
+    return results
 
 print("\nDone.")

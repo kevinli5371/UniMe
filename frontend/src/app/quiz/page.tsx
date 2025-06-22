@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import quizData from './questions.json';
 import './likert.css'; // Import the CSS file
 import './quiz.css'; // Import the CSS file for general styles
@@ -46,6 +47,7 @@ const typedQuizData = quizData as QuizData;
 
 export default function Quiz() {
     const [answers, setAnswers] = useState<Record<number, string[] | string | number>>({});
+    const router = useRouter();
 
     const handleCheckboxChange = (questionId: number, optionValue: string, maxSelections: number) => {
         setAnswers((prevAnswers) => {
@@ -110,6 +112,18 @@ export default function Quiz() {
                 return typeof answer === 'string' && answer !== '';
             }
         });
+    };
+
+    // Submit handler
+    const handleSubmit = async () => {
+        const res = await fetch("http://localhost:5000/api/match", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(answers),
+        });
+        const matches = await res.json();
+        localStorage.setItem("matches", JSON.stringify(matches));
+        router.push("/matches");
     };
 
     // Render checkbox question
@@ -283,25 +297,23 @@ export default function Quiz() {
             </div>
 
             <div style={{ textAlign: 'center', marginTop: '40px' }}>
-                <Link href="/matches">
-                    <button
-                        disabled={!isQuizComplete()}
-                        style={{
-                            padding: '15px 30px',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            backgroundColor: isQuizComplete() ? '#28a745' : '#ccc',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: isQuizComplete() ? 'pointer' : 'not-allowed',
-                            transition: 'background-color 0.2s ease'
-                        }}
-                        onClick={() => console.log("Answers:", answers)}
-                    >
-                        Submit Quiz
-                    </button>
-                </Link>
+                <button
+                    disabled={!isQuizComplete()}
+                    onClick={handleSubmit}
+                    style={{
+                        padding: '15px 30px',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        backgroundColor: isQuizComplete() ? '#28a745' : '#ccc',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: isQuizComplete() ? 'pointer' : 'not-allowed',
+                        transition: 'background-color 0.2s ease'
+                    }}
+                >
+                    Submit Quiz
+                </button>
                 
                 {!isQuizComplete() && (
                     <p style={{ marginTop: '10px', color: '#666', fontSize: '14px' }}>

@@ -13,7 +13,16 @@ Usage:
 Outputs the top 10 matches with scores.
 """
 import json
+import sys
+from io import BytesIO
 from tqdm import tqdm
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+import os
+import datetime
 
 # Load program profiles
 try:
@@ -213,6 +222,44 @@ def enhanced_course_score(user_courses, program_courses):
     match_ratio = len(mapped_program_courses) / max(len(user_courses), 1)
     return min(match_ratio, 1.0)  # Cap at 1.0
 
+# Ask weights
+print("Rate how much each factor matters to you (they will be normalized):")
+wa = float(input("Academics weight (e.g. 1): ") or 1)
+wa = wa * 1.75
+wc = float(input("Campus life weight  (e.g. 1): ") or 1)
+wso = float(input("Social weight       (e.g. 1): ") or 1)
+W_TOTAL = wa + wc + wso
+
+# Academic questions
+print("\n--- Academics ---")
+AA = multi_select("Pick up to three broad academic interests", ["Engineering","CS/Math","Business","Arts/Humanities","Sciences","Health","Undecided"], INTEREST_DESCRIPTIONS)
+LS = int(input("How do you prefer to learn? (1=Theoretical ... 5=Hands-on): ") or 3)
+SP = int(input("How specialized should 1st-year be? (1=Very broad ... 5=Highly specialized): ") or 3)
+CO = int(input("How critical is co-op/internship? (1=Not important ... 5=Essential): ") or 3)
+UR = int(input("Undergraduate research importance? (1=Not at all ... 5=Essential): ") or 3)
+CR = int(input("Are you creative? (1=Not creative ... 5=Very creative): ") or 3)
+CE = int(input("Career certainty? (1=Not sure ... 5=Very sure): ") or 3)
+LC = multi_select("What HS courses did you like?", ["Autoshop","Biology","Business","Chemistry","Computer Science","Geography","History","Language Arts","Math","Physics","Visual Arts"])
+ME = int(input("Math enjoyment? (1=Hate ... 5=Love): ") or 3)
+CP = int(input("Collaboration preference? (1=Alone ... 5=Group): ") or 3)
+ALT = []
+if "Engineering" in AA:
+    ALT = list(multi_select("If not Eng, alternatives?", ["Applied Science","Business","Computer Science","Economics","English Literature","Environmental Studies","Finance","Geography","Graphic Design","Health Studies","Marketing","Math","Political Science","Psychology","Visual Arts"]))
+
+# Campus questions
+print("\n--- Campus Life ---")
+CSB = single_select("Ideal class size?", ["< 60","60-200","200+"])
+SET = single_select("Campus setting you'd enjoy most?", ["Urban","Suburban","Small-town","Rural"])
+HS = set(multi_select("Preferred first-year housing style", ["Traditional dorm","Suite-style","Apartment","Off-campus"]))
+CPS = single_select("Preferred campus size?", ["Small","Medium","Large"])
+
+# Social questions
+print("\n--- Social & Extracurriculars ---")
+NS = int(input("Night-and-weekend scene? (1=Quiet ... 5=Very lively): ") or 3)
+SPT = multi_select("Which varsity/rec sports?", ["Basketball","Soccer","Hockey","Rugby","Volleyball","Football","None"])
+CLB = multi_select("Which clubs interest you?", ["Hackathons","Case comps","Design teams","Performing arts","Volunteering","Entrepreneurship"])
+CEV = int(input("How often attend concerts/cultural events? (1=Never ... 5=Very often): ") or 3)
+
 # Scoring functions
 from math import fabs
 
@@ -354,6 +401,292 @@ def score_social(p, user_answers):
     
     # Average all scores with equal weighting
     return (ns_score + spt_score + cl_score + cev_score) / 4
+
+def generate_matches_pdf(results, user_answers=None, output_path=None):
+    """
+    Generate a PDF with the top 100 program matches and their scores.
+    
+    Args:
+        results: List of tuples (total_score, academic_score, campus_score, social_score, university, program)
+        user_answers: Optional dictionary of user's quiz answers for the summary
+        output_path: Path to save the PDF (if None, uses default name)
+    
+    Returns:
+        Path to the generated PDF file
+    """
+    # Default output path if none provided
+    if output_path is None:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = f"program_matches_{timestamp}.pdf"
+    
+    # Take top 100 or all results if less than 100
+    top_programs = results[:min(100, len(results))]
+    
+    # Create PDF - Switch to landscape orientation
+    doc = SimpleDocTemplate(output_path, pagesize=letter, rightMargin=30, leftMargin=30, 
+                           topMargin=30, bottomMargin=18)
+    
+    # Rotate the page to landscape orientation
+    doc.pagesize = landscape(letter)
+    
+    styles = getSampleStyleSheet()
+    
+    # Modify existing styles instead of adding new ones with the same name
+    styles['Title'].alignment = 1  # Center
+    styles['Title'].spaceAfter = 12
+    
+    # Create a custom subtitle style with a unique name
+    styles.add(ParagraphStyle(name='CustomSubtitle', 
+                              parent=styles['Heading2'], 
+                              alignment=1,  # Center
+                              spaceAfter=10))
+    
+    # Create style for program name cells with wrapping
+    program_style = ParagraphStyle(
+        name='ProgramStyle',
+        parent=styles['Normal'],
+        fontSize=9,
+        leading=10,
+        alignment=0,  # Left alignment
+    )
+    
+    # Build content
+    content = []
+    
+    # Title
+    content.append(Paragraph("LinkU: Your University Program Matches", styles['Title']))
+    content.append(Spacer(1, 0.25*inch))
+    
+    # User profile summary - if answers provided
+    if user_answers:
+        content.append(Paragraph("Your Profile Summary", styles['CustomSubtitle']))
+        content.append(Spacer(1, 0.25*inch))
+    
+    # Summary of weights
+    content.append(Paragraph(f"<b>Academic Weight:</b> {wa:.2f}", styles['Normal']))
+    content.append(Paragraph(f"<b>Campus Life Weight:</b> {wc:.2f}", styles['Normal']))
+    content.append(Paragraph(f"<b>Social Weight:</b> {wso:.2f}", styles['Normal']))
+    content.append(Paragraph(f"<b>Generated:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+    content.append(Spacer(1, 0.25*inch))
+    
+    # Top programs heading
+    content.append(Paragraph(f"<b>Top {len(top_programs)} Program Matches</b>", styles['Heading2']))
+    content.append(Spacer(1, 0.1*inch))
+    
+    # Table data with wrapping program text
+    table_data = [["Rank", "University", "Program", "Academic", "Campus", "Social", "Total"]]
+    
+    for i, (tot, a, c, soc, uni, prog) in enumerate(top_programs):
+        # Convert the program name to a Paragraph object for wrapping
+        program_cell = Paragraph(prog, program_style)
+        
+        table_data.append([
+            str(i+1),
+            uni,
+            program_cell,  # Using Paragraph instead of string
+            f"{a:.3f}",
+            f"{c:.3f}",
+            f"{soc:.3f}",
+            f"{tot:.3f}"
+        ])
+    
+    # Create the table with column widths
+    col_widths = [30, 110, 200, 60, 60, 60, 60]  # Adjust column widths
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    
+    # Define basic style first
+    style = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        # Make rank column centered
+        ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+        # Make university column left-aligned
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+        # Program column already left-aligned by the Paragraph style
+        # Make numeric columns right-aligned
+        ('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
+        # Vertical alignment
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        # Add padding to cells
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ]
+    
+    # Add alternating row backgrounds
+    for row in range(1, len(table_data), 2):
+        style.append(('BACKGROUND', (0, row), (-1, row), colors.lightgrey))
+    
+    # Add conditional formatting for high scores
+    for row in range(1, len(table_data)):
+        # Academic score highlighting
+        try:
+            if float(table_data[row][3]) > 0.6:
+                style.append(('BACKGROUND', (3, row), (3, row), colors.palegreen))
+        except (ValueError, TypeError):
+            pass
+        
+        # Campus score highlighting
+        try:
+            if float(table_data[row][4]) > 0.85:
+                style.append(('BACKGROUND', (4, row), (4, row), colors.palegreen))
+        except (ValueError, TypeError):
+            pass
+        
+        # Social score highlighting
+        try:
+            if float(table_data[row][5]) > 0.9:
+                style.append(('BACKGROUND', (5, row), (5, row), colors.palegreen))
+        except (ValueError, TypeError):
+            pass
+    
+    table.setStyle(TableStyle(style))
+    content.append(table)
+    
+    # Build the PDF
+    doc.build(content)
+    
+    return output_path
+
+def generate_matches_pdf_bytes(results):
+    """
+    Generate a PDF with the top 100 program matches and return as bytes
+    for browser download.
+    
+    Args:
+        results: List of tuples (total_score, academic_score, campus_score, social_score, university, program)
+    
+    Returns:
+        BytesIO object containing the PDF data
+    """
+    # Create a BytesIO buffer instead of file
+    buffer = BytesIO()
+    
+    # Create PDF - Switch to landscape orientation
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=30, leftMargin=30, 
+                           topMargin=30, bottomMargin=18)
+    
+    # Rotate the page to landscape orientation
+    doc.pagesize = landscape(letter)
+    
+    # Take top 100 or all results if less than 100
+    top_programs = results[:min(100, len(results))]
+    
+    # Rest of the function is exactly the same as generate_matches_pdf
+    styles = getSampleStyleSheet()
+    
+    styles['Title'].alignment = 1
+    styles['Title'].spaceAfter = 12
+    
+    # Create a custom subtitle style with a unique name
+    styles.add(ParagraphStyle(name='CustomSubtitle', 
+                             parent=styles['Heading2'], 
+                             alignment=1,  # Center
+                             spaceAfter=10))
+    
+    # Create style for program name cells with wrapping
+    program_style = ParagraphStyle(
+        name='ProgramStyle',
+        parent=styles['Normal'],
+        fontSize=9,
+        leading=10,
+        alignment=0,  # Left alignment
+    )
+    
+    # Build content
+    content = []
+    
+    # Title
+    content.append(Paragraph("LinkU: Your University Program Matches", styles['Title']))
+    content.append(Spacer(1, 0.25*inch))
+    
+    # Summary of weights
+    content.append(Paragraph(f"<b>Academic Weight:</b> {wa:.2f}", styles['Normal']))
+    content.append(Paragraph(f"<b>Campus Life Weight:</b> {wc:.2f}", styles['Normal']))
+    content.append(Paragraph(f"<b>Social Weight:</b> {wso:.2f}", styles['Normal']))
+    content.append(Paragraph(f"<b>Generated:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+    content.append(Spacer(1, 0.25*inch))
+    
+    # Top programs heading
+    content.append(Paragraph(f"<b>Top {len(top_programs)} Program Matches</b>", styles['Heading2']))
+    content.append(Spacer(1, 0.1*inch))
+    
+    # Table data with wrapping program text
+    table_data = [["Rank", "University", "Program", "Academic", "Campus", "Social", "Total"]]
+    
+    for i, (tot, a, c, soc, uni, prog) in enumerate(top_programs):
+        program_cell = Paragraph(prog, program_style)
+        
+        table_data.append([
+            str(i+1),
+            uni,
+            program_cell,
+            f"{a:.3f}",
+            f"{c:.3f}",
+            f"{soc:.3f}",
+            f"{tot:.3f}"
+        ])
+    
+    # Rest of function continues as before...
+    col_widths = [30, 110, 200, 60, 60, 60, 60]
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    
+    # Define basic style (same as original)
+    style = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+        ('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ]
+    
+    # Add alternating row backgrounds
+    for row in range(1, len(table_data), 2):
+        style.append(('BACKGROUND', (0, row), (-1, row), colors.lightgrey))
+    
+    # Add conditional formatting for high scores (same as original)
+    for row in range(1, len(table_data)):
+        try:
+            if float(table_data[row][3]) > 0.6:
+                style.append(('BACKGROUND', (3, row), (3, row), colors.palegreen))
+        except (ValueError, TypeError):
+            pass
+        
+        try:
+            if float(table_data[row][4]) > 0.85:
+                style.append(('BACKGROUND', (4, row), (4, row), colors.palegreen))
+        except (ValueError, TypeError):
+            pass
+        
+        try:
+            if float(table_data[row][5]) > 0.9:
+                style.append(('BACKGROUND', (5, row), (5, row), colors.palegreen))
+        except (ValueError, TypeError):
+            pass
+    
+    table.setStyle(TableStyle(style))
+    content.append(table)
+    
+    # Build the PDF to the buffer
+    doc.build(content)
+    
+    # Reset buffer position to the beginning
+    buffer.seek(0)
+    return buffer
 
 # Compute and rank
 def compute_matches(user_answers):

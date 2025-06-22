@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import json
+import datetime
 from match_me import INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, enhanced_interest_score, enhanced_course_score
 
 app = Flask(__name__)
@@ -9,7 +10,7 @@ CORS(app, origins=["http://localhost:3000"])
 with open('backend/program_profiles.json', 'r', encoding='utf-8') as f:
     programs = json.load(f)
 
-def compute_matches(answers):
+def compute_matches(answers, num_results=10):
     # Unpack answers from frontend (make sure keys match your frontend)
     wa = float(answers.get("wa", 1))
     wc = float(answers.get("wc", 1))
@@ -141,7 +142,8 @@ def compute_matches(answers):
             "social": s
         })
     results.sort(key=lambda x: x["overall"], reverse=True)
-    return results[:10]
+    return results[:num_results]
+
 
 
 @app.route('/api/match', methods=['POST'])
@@ -156,6 +158,52 @@ def match_api():
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/download-pdf', methods=['POST'])
+def download_pdf():
+    try:
+        # Get results from request
+        data = request.json
+        results = data.get('results', [])
+        weights = data.get('weights', {'wa': 0.6, 'wc': 0.2, 'wso': 0.2})
+        
+        # Generate PDF bytes
+        from match_me import generate_matches_pdf_bytes
+        pdf_buffer = generate_matches_pdf_bytes(results, weights)
+        
+        # Generate filename with timestamp
+        filename = f"LinkU_matches_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        
+        # Send file to client for download
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        print(f"PDF generation error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/full-matches', methods=['POST'])
+def get_full_matches():
+    try:
+        # Get quiz answers
+        answers = request.json
+        
+        # Compute all matches
+        results = compute_matches(answers, num_results=100)
+        
+        # Results are already in the right format, no need to transform
+        return jsonify({
+            "success": True,
+            "matches": results
+        })
+    except Exception as e:
+        print(f"Error computing matches: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 if __name__ == '__main__':
     print("Starting Flask server on port 5001...")
     app.run(host='0.0.0.0', port=5001, debug=True)
+

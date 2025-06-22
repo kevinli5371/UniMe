@@ -1,0 +1,29 @@
+{
+    "success": true,
+    "data": [
+        {
+            "school": "University of Waterloo",
+            "program": "Computer Science",
+            "overall": "50%",
+            "academic": "70%",
+            "social": "60%",
+            "campus": "40%"
+        },
+        {
+            "school": "University of Toronto",
+            "program": "Computer Science",
+            "overall": "20%",
+            "academic": "40%",
+            "social": "15%",
+            "campus": "30%"
+        },
+        {
+            "school": "University of British Columbia",
+            "program": "Computer Science",
+            "overall": "65%",
+            "academic": "30%",
+            "social": "60%",
+            "campus": "80%"
+        }
+    ]
+}

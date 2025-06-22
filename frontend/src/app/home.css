@@ -1,0 +1,87 @@
+.home {
+    width: 100vw;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.landing {
+    /* border: 1px solid white; */
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+.matchme {
+    /* border: 1px solid white; */
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a; /* Optional: different background */
+}
+
+.chanceme {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.text{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.home button {
+    background-color: #36A8B4;
+    border: none;
+    margin: 1.5rem;
+    border-radius: 5rem;
+    width: 12rem;
+    height: 4rem;
+    color: white;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.home button:hover {
+    background-color: #2a7f8c;
+    transition: ease-in-out 0.15s;
+}
+
+.home p {
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 300;
+}
+
+.home h1 {
+    color: white;
+    font-weight: bold;
+    font-size: 5rem;
+}
+
+.matchme p, .chanceme p {
+    width: 43%;
+    text-align: center;
+}
+
+.matchme button, .chanceme button {
+    width: 16rem;
+    height: 4rem;
+}

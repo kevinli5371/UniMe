@@ -1,0 +1,22 @@
+.matches-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+.match-list {
+    /* border: 1px solid red; */
+    width: 50%;
+}
+
+.match {
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+.popup {
+    border: 1px solid red;
+    width: 50vw;
+    height: 50vh;
+}

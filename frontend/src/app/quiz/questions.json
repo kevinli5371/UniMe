@@ -1,0 +1,386 @@
+{
+  "title": "University Program Matching Quiz - Weights",
+  "sections": [
+    {
+      "id": "weights",
+      "title": "Importance Weights",
+      "description": "Rate how much each factor matters to you (they will be normalized)",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Academics weight",
+          "type": "likert",
+          "scale": 10,
+          "leftLabel": "Not Important",
+          "rightLabel": "Very Important",
+          "defaultValue": 5,
+          "options": [
+            { "id": "weight_1", "label": "1", "value": 1 },
+            { "id": "weight_2", "label": "2", "value": 2 },
+            { "id": "weight_3", "label": "3", "value": 3 },
+            { "id": "weight_4", "label": "4", "value": 4 },
+            { "id": "weight_5", "label": "5", "value": 5 },
+            { "id": "weight_6", "label": "6", "value": 6 },
+            { "id": "weight_7", "label": "7", "value": 7 },
+            { "id": "weight_8", "label": "8", "value": 8 },
+            { "id": "weight_9", "label": "9", "value": 9 },
+            { "id": "weight_10", "label": "10", "value": 10 }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Campus life weight",
+          "type": "likert",
+          "scale": 10,
+          "leftLabel": "Not Important",
+          "rightLabel": "Very Important",
+          "defaultValue": 5,
+          "options": [
+            { "id": "weight_1", "label": "1", "value": 1 },
+            { "id": "weight_2", "label": "2", "value": 2 },
+            { "id": "weight_3", "label": "3", "value": 3 },
+            { "id": "weight_4", "label": "4", "value": 4 },
+            { "id": "weight_5", "label": "5", "value": 5 },
+            { "id": "weight_6", "label": "6", "value": 6 },
+            { "id": "weight_7", "label": "7", "value": 7 },
+            { "id": "weight_8", "label": "8", "value": 8 },
+            { "id": "weight_9", "label": "9", "value": 9 },
+            { "id": "weight_10", "label": "10", "value": 10 }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Social weight",
+          "type": "likert",
+          "scale": 10,
+          "leftLabel": "Not Important",
+          "rightLabel": "Very Important",
+          "defaultValue": 5,
+          "options": [
+            { "id": "weight_1", "label": "1", "value": 1 },
+            { "id": "weight_2", "label": "2", "value": 2 },
+            { "id": "weight_3", "label": "3", "value": 3 },
+            { "id": "weight_4", "label": "4", "value": 4 },
+            { "id": "weight_5", "label": "5", "value": 5 },
+            { "id": "weight_6", "label": "6", "value": 6 },
+            { "id": "weight_7", "label": "7", "value": 7 },
+            { "id": "weight_8", "label": "8", "value": 8 },
+            { "id": "weight_9", "label": "9", "value": 9 },
+            { "id": "weight_10", "label": "10", "value": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "academics",
+      "title": "Academics",
+      "questions": [
+        {
+          "id": 4,
+          "question": "Pick up to three broad academic interests",
+          "type": "checkbox",
+          "maxSelections": 3,
+          "options": [
+            { "id": "engineering", "label": "Engineering", "value": "engineering" },
+            { "id": "cs_math", "label": "CS/Math", "value": "cs-math" },
+            { "id": "business", "label": "Business", "value": "business" },
+            { "id": "arts_humanities", "label": "Arts/Humanities", "value": "arts-humanities" },
+            { "id": "sciences", "label": "Sciences", "value": "sciences" },
+            { "id": "health", "label": "Health", "value": "health" },
+            { "id": "undecided", "label": "Undecided", "value": "undecided" }
+          ]
+        },
+        {
+          "id": 5,
+          "question": "How do you prefer to learn?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Theoretical",
+          "rightLabel": "Hands-on",
+          "defaultValue": 3,
+          "options": [
+            { "id": "theoretical", "label": "Theoretical", "value": 1 },
+            { "id": "mostly_theoretical", "label": "Mostly Theoretical", "value": 2 },
+            { "id": "balanced", "label": "Balanced", "value": 3 },
+            { "id": "mostly_handson", "label": "Mostly Hands-on", "value": 4 },
+            { "id": "handson", "label": "Hands-on", "value": 5 }
+          ]
+        },
+        {
+          "id": 6,
+          "question": "How specialized should 1st-year be?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Very broad",
+          "rightLabel": "Highly specialized",
+          "defaultValue": 3,
+          "options": [
+            { "id": "very_broad", "label": "Very broad", "value": 1 },
+            { "id": "mostly_broad", "label": "Mostly broad", "value": 2 },
+            { "id": "moderate", "label": "Moderate", "value": 3 },
+            { "id": "mostly_specialized", "label": "Mostly specialized", "value": 4 },
+            { "id": "highly_specialized", "label": "Highly specialized", "value": 5 }
+          ]
+        },
+        {
+          "id": 7,
+          "question": "How critical is co-op/internship?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Not important",
+          "rightLabel": "Essential",
+          "defaultValue": 3,
+          "options": [
+            { "id": "not_important", "label": "Not important", "value": 1 },
+            { "id": "slightly_important", "label": "Slightly important", "value": 2 },
+            { "id": "moderately_important", "label": "Moderately important", "value": 3 },
+            { "id": "very_important", "label": "Very important", "value": 4 },
+            { "id": "essential", "label": "Essential", "value": 5 }
+          ]
+        },
+        {
+          "id": 8,
+          "question": "Undergraduate research importance?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Not at all",
+          "rightLabel": "Essential",
+          "defaultValue": 3,
+          "options": [
+            { "id": "not_at_all", "label": "Not at all", "value": 1 },
+            { "id": "slightly", "label": "Slightly important", "value": 2 },
+            { "id": "moderately", "label": "Moderately important", "value": 3 },
+            { "id": "very", "label": "Very important", "value": 4 },
+            { "id": "essential", "label": "Essential", "value": 5 }
+          ]
+        },
+        {
+          "id": 9,
+          "question": "Are you creative?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Not creative",
+          "rightLabel": "Very creative",
+          "defaultValue": 3,
+          "options": [
+            { "id": "not_creative", "label": "Not creative", "value": 1 },
+            { "id": "slightly_creative", "label": "Slightly creative", "value": 2 },
+            { "id": "moderately_creative", "label": "Moderately creative", "value": 3 },
+            { "id": "creative", "label": "Creative", "value": 4 },
+            { "id": "very_creative", "label": "Very creative", "value": 5 }
+          ]
+        },
+        {
+          "id": 10,
+          "question": "Career certainty?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Not sure",
+          "rightLabel": "Very sure",
+          "defaultValue": 3,
+          "options": [
+            { "id": "not_sure", "label": "Not sure", "value": 1 },
+            { "id": "somewhat_unsure", "label": "Somewhat unsure", "value": 2 },
+            { "id": "neutral", "label": "Neutral", "value": 3 },
+            { "id": "mostly_sure", "label": "Mostly sure", "value": 4 },
+            { "id": "very_sure", "label": "Very sure", "value": 5 }
+          ]
+        },
+        {
+          "id": 11,
+          "question": "What HS courses did you like?",
+          "type": "checkbox",
+          "maxSelections": 5,
+          "options": [
+            { "id": "autoshop", "label": "Autoshop", "value": "autoshop" },
+            { "id": "biology", "label": "Biology", "value": "biology" },
+            { "id": "business", "label": "Business", "value": "business" },
+            { "id": "chemistry", "label": "Chemistry", "value": "chemistry" },
+            { "id": "computer_science", "label": "Computer Science", "value": "computer-science" },
+            { "id": "geography", "label": "Geography", "value": "geography" },
+            { "id": "history", "label": "History", "value": "history" },
+            { "id": "language_arts", "label": "Language Arts", "value": "language-arts" },
+            { "id": "math", "label": "Math", "value": "math" },
+            { "id": "physics", "label": "Physics", "value": "physics" },
+            { "id": "visual_arts", "label": "Visual Arts", "value": "visual-arts" }
+          ]
+        },
+        {
+          "id": 12,
+          "question": "Math enjoyment?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Hate",
+          "rightLabel": "Love",
+          "defaultValue": 3,
+          "options": [
+            { "id": "hate", "label": "Hate", "value": 1 },
+            { "id": "dislike", "label": "Dislike", "value": 2 },
+            { "id": "neutral", "label": "Neutral", "value": 3 },
+            { "id": "like", "label": "Like", "value": 4 },
+            { "id": "love", "label": "Love", "value": 5 }
+          ]
+        },
+        {
+          "id": 13,
+          "question": "Collaboration preference?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Alone",
+          "rightLabel": "Group",
+          "defaultValue": 3,
+          "options": [
+            { "id": "alone", "label": "Alone", "value": 1 },
+            { "id": "mostly_alone", "label": "Mostly alone", "value": 2 },
+            { "id": "balanced", "label": "Balanced", "value": 3 },
+            { "id": "mostly_group", "label": "Mostly group", "value": 4 },
+            { "id": "group", "label": "Group", "value": 5 }
+          ]
+        },
+        {
+          "id": 14,
+          "question": "If not Engineering, alternatives?",
+          "type": "checkbox",
+          "maxSelections": 5,
+          "conditional": {
+            "dependsOn": 4,
+            "requiredValue": "engineering"
+          },
+          "options": [
+            { "id": "applied_science", "label": "Applied Science", "value": "applied-science" },
+            { "id": "business_alt", "label": "Business", "value": "business" },
+            { "id": "computer_science_alt", "label": "Computer Science", "value": "computer-science" },
+            { "id": "economics", "label": "Economics", "value": "economics" },
+            { "id": "english_literature", "label": "English Literature", "value": "english-literature" },
+            { "id": "environmental_studies", "label": "Environmental Studies", "value": "environmental-studies" },
+            { "id": "finance", "label": "Finance", "value": "finance" },
+            { "id": "geography_alt", "label": "Geography", "value": "geography" },
+            { "id": "graphic_design", "label": "Graphic Design", "value": "graphic-design" },
+            { "id": "health_studies", "label": "Health Studies", "value": "health-studies" },
+            { "id": "marketing", "label": "Marketing", "value": "marketing" },
+            { "id": "math_alt", "label": "Math", "value": "math" },
+            { "id": "political_science", "label": "Political Science", "value": "political-science" },
+            { "id": "psychology", "label": "Psychology", "value": "psychology" },
+            { "id": "visual_arts_alt", "label": "Visual Arts", "value": "visual-arts" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "campus",
+      "title": "Campus Life",
+      "questions": [
+        {
+          "id": 15,
+          "question": "Ideal class size?",
+          "type": "radio",
+          "options": [
+            { "id": "small", "label": "< 60", "value": "< 60" },
+            { "id": "medium", "label": "60-200", "value": "60-200" },
+            { "id": "large", "label": "200+", "value": "200+" }
+          ]
+        },
+        {
+          "id": 16,
+          "question": "Campus setting you'd enjoy most?",
+          "type": "radio",
+          "options": [
+            { "id": "urban", "label": "Urban", "value": "urban" },
+            { "id": "suburban", "label": "Suburban", "value": "suburban" },
+            { "id": "small_town", "label": "Small-town", "value": "small-town" },
+            { "id": "rural", "label": "Rural", "value": "rural" }
+          ]
+        },
+        {
+          "id": 17,
+          "question": "Preferred first-year housing style",
+          "type": "checkbox",
+          "maxSelections": 4,
+          "options": [
+            { "id": "traditional_dorm", "label": "Traditional dorm", "value": "traditional-dorm" },
+            { "id": "suite_style", "label": "Suite-style", "value": "suite-style" },
+            { "id": "apartment", "label": "Apartment", "value": "apartment" },
+            { "id": "off_campus", "label": "Off-campus", "value": "off-campus" }
+          ]
+        },
+        {
+          "id": 18,
+          "question": "Preferred campus size?",
+          "type": "radio",
+          "options": [
+            { "id": "small", "label": "Small", "value": "small" },
+            { "id": "medium", "label": "Medium", "value": "medium" },
+            { "id": "large", "label": "Large", "value": "large" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social",
+      "title": "Social & Extracurriculars",
+      "questions": [
+        {
+          "id": 19,
+          "question": "Night-and-weekend scene?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Quiet",
+          "rightLabel": "Very lively",
+          "defaultValue": 3,
+          "options": [
+            { "id": "quiet", "label": "Quiet", "value": 1 },
+            { "id": "mostly_quiet", "label": "Mostly quiet", "value": 2 },
+            { "id": "moderate", "label": "Moderate", "value": 3 },
+            { "id": "mostly_lively", "label": "Mostly lively", "value": 4 },
+            { "id": "very_lively", "label": "Very lively", "value": 5 }
+          ]
+        },
+        {
+          "id": 20,
+          "question": "Which varsity/rec sports?",
+          "type": "checkbox",
+          "maxSelections": 7,
+          "options": [
+            { "id": "basketball", "label": "Basketball", "value": "basketball" },
+            { "id": "soccer", "label": "Soccer", "value": "soccer" },
+            { "id": "hockey", "label": "Hockey", "value": "hockey" },
+            { "id": "rugby", "label": "Rugby", "value": "rugby" },
+            { "id": "volleyball", "label": "Volleyball", "value": "volleyball" },
+            { "id": "football", "label": "Football", "value": "football" },
+            { "id": "none", "label": "None", "value": "none" }
+          ]
+        },
+        {
+          "id": 21,
+          "question": "Which clubs interest you?",
+          "type": "checkbox",
+          "maxSelections": 6,
+          "options": [
+            { "id": "hackathons", "label": "Hackathons", "value": "hackathons" },
+            { "id": "case_comps", "label": "Case comps", "value": "case-comps" },
+            { "id": "design_teams", "label": "Design teams", "value": "design-teams" },
+            { "id": "performing_arts", "label": "Performing arts", "value": "performing-arts" },
+            { "id": "volunteering", "label": "Volunteering", "value": "volunteering" },
+            { "id": "entrepreneurship", "label": "Entrepreneurship", "value": "entrepreneurship" }
+          ]
+        },
+        {
+          "id": 22,
+          "question": "Cultural events attendance?",
+          "type": "likert",
+          "scale": 5,
+          "leftLabel": "Never",
+          "rightLabel": "Very often",
+          "defaultValue": 3,
+          "options": [
+            { "id": "never", "label": "Never", "value": 1 },
+            { "id": "rarely", "label": "Rarely", "value": 2 },
+            { "id": "sometimes", "label": "Sometimes", "value": 3 },
+            { "id": "often", "label": "Often", "value": 4 },
+            { "id": "very_often", "label": "Very often", "value": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

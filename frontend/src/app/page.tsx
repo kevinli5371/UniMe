@@ -35,8 +35,8 @@ export default function Home() {
       <div className="content">
         <div className="landing" ref={landingRef}>
           <div className="text">
-            <p>Match, Chance, Connect, </p>
             <h1>UniMe</h1>
+            <p style={{ width: '100%' }}>Your personal digital guidance counselor</p>
           </div>
           <div className="button-container">
             <Link href="/quiz">

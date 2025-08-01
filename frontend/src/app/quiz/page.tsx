@@ -254,13 +254,13 @@ export default function Quiz() {
                     <div id="2" className="info-circle-2">
                         <div className="circle-text">
                             <h2>View Your Matches</h2>
-                            <p>Be yourself and answer honestly to find out your personality type.</p>
+                            <p>Discover which universities align with you the most.</p>
                         </div>
                     </div>
                     <div className="info-circle-3">
                         <div className="circle-text">
                             <h2>Connect With a Current Student</h2>
-                            <p>Be yourself and answer honestly to find out your personality type.</p>
+                            <p>Get connected with student mentors studying at one of your matched schools.</p>
                         </div>
                     </div>
                 </div>

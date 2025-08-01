@@ -177,6 +177,15 @@ html {
     height: 4rem;
 }
 
+.error-message {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+  }
+
 /* Responsive design */
 @media (max-width: 768px) {
     .text h1 {

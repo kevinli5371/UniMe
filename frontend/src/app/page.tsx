@@ -1,12 +1,20 @@
 "use client";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { supabase } from '../../supabase/supabaseClient';
 import './home.css';
 
 export default function Home() {
   const landingRef = useRef<HTMLDivElement>(null);
   const matchmeRef = useRef<HTMLDivElement>(null);
   const chancemeRef = useRef<HTMLDivElement>(null);
+  
+  // Login state
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const observerOptions = {
@@ -30,6 +38,35 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        setError(error.message);
+        console.error('Login error:', error);
+      } else {
+        console.log('Login successful:', data);
+        alert('Login successful!');
+        setShowLogin(false);
+        setEmail('');
+        setPassword('');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="home">
       <div className="content">
@@ -45,7 +82,39 @@ export default function Home() {
             <Link href="/chance">
               <button className="button">ChanceMe</button>
             </Link>
+            <button 
+              className="button login-btn" 
+              onClick={() => setShowLogin(!showLogin)}
+            >
+              {showLogin ? 'Cancel' : 'Login'}
+            </button>
           </div>
+
+          {/* Simple Login Form */}
+          {showLogin && (
+            <div className="login-form">
+              <form onSubmit={handleLogin}>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                {error && <div className="error-message">{error}</div>}
+                <button type="submit" disabled={loading}>
+                  {loading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
 
         <div className="matchme" ref={matchmeRef}>

@@ -26,7 +26,7 @@ import os
 
 # Load program profiles
 try:
-    with open('backend/program_profiles.json', 'r', encoding='utf-8') as f:
+    with open('program_profiles.json', 'r', encoding='utf-8') as f:
         programs = json.load(f)
 except FileNotFoundError:
     print("Error: program_profiles.json not found. Make sure it exists in this folder.")

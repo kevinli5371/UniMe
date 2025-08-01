@@ -1,8 +1,11 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 import json
 import datetime
-import os
 import random
 from match_me import INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, enhanced_interest_score, enhanced_course_score
 from chanceMe import predict_admission_chance
@@ -16,7 +19,9 @@ app.static_folder = 'static'
 def serve_static(filename):
     return send_from_directory(app.static_folder, filename)
 
-with open('backend/program_profiles.json', 'r', encoding='utf-8') as f:
+# Fix the file path here - change from 'backend/program_profiles.json' to just 'program_profiles.json'
+file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'program_profiles.json')
+with open(file_path, 'r', encoding='utf-8') as f:
     programs = json.load(f)
 
 def compute_matches(answers, num_results=10):

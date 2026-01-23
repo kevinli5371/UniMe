@@ -7,11 +7,14 @@ from flask_cors import CORS
 import json
 import datetime
 import random
-from match_me import INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, enhanced_interest_score, enhanced_course_score
+from match_me import (INTEREST_MAPPINGS, COURSE_MAPPINGS, INTEREST_DESCRIPTIONS, 
+                       enhanced_interest_score, enhanced_course_score,
+                       normalize_string, detect_program_type, PROGRAM_TYPE_WEIGHTS,
+                       calculate_trait_score_with_confidence, score_categorical_distance)
 from chanceMe import predict_admission_chance
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app)  # Allow all origins for production
 
 app.static_folder = 'static'
 
@@ -56,15 +59,21 @@ def compute_matches(answers, num_results=10):
         i_score = enhanced_interest_score(AA, prog_int) * 0.4
         prog_lc = p['academic'].get('liked_hs_courses', [])
         lc_score = enhanced_course_score(LC, prog_lc) * 0.2
-        prog_alt = set(p['academic'].get('alt_to_engineering', []))
+        
+        # Normalize alternatives for matching
+        prog_alt = {normalize_string(a) for a in p['academic'].get('alt_to_engineering', [])}
         alt_score = 0
         if ALT:
-            matched_alts = prog_alt.intersection(set(ALT))
+            user_alt_normalized = {normalize_string(a) for a in ALT}
+            matched_alts = prog_alt.intersection(user_alt_normalized)
             alt_score = (len(matched_alts) / max(len(ALT), 1)) * 0.1
+        
         keys = ['learning_style', 'first_year_specialization', 'coop_importance', 
                 'research_importance', 'creativity_orientation', 'career_certainty', 
                 'math_enjoyment', 'collaboration_preference']
         vals = [LS, SP, CO, UR, CR, CE, ME, CP]
+        
+        # Base weights
         weights = {
             'learning_style': 1.2,
             'first_year_specialization': 1.0,
@@ -75,70 +84,118 @@ def compute_matches(answers, num_results=10):
             'math_enjoyment': 1.3,
             'collaboration_preference': 1.0
         }
+        
+        # Apply program-type-specific weight adjustments
+        program_type = detect_program_type(p)
+        if program_type and program_type in PROGRAM_TYPE_WEIGHTS:
+            type_weights = PROGRAM_TYPE_WEIGHTS[program_type]
+            for key, multiplier in type_weights.items():
+                if key in weights:
+                    weights[key] *= multiplier
+        
         total_weight = sum(weights.values())
         num_scores = []
         for k, s in zip(keys, vals):
             prog_val = p['academic'].get(k, 3)
-            similarity = 1 - (abs(prog_val - s) / 4.0)
+            # Use confidence-weighted scoring
+            weighted_similarity = calculate_trait_score_with_confidence(s, prog_val)
             weight = weights[k]
-            num_scores.append(similarity * weight)
+            num_scores.append(weighted_similarity * weight)
         num_score = sum(num_scores) / total_weight * 0.3
         return i_score + lc_score + num_score + alt_score
 
     def score_campus(p):
         base = p['campus']
         scores = []
-        if base.get('class_size_bin') == CSB:
+        
+        # Class size - using distance-based scoring
+        class_size_order = ["< 60", "60-200", "200+"]
+        class_size_score = score_categorical_distance(
+            CSB, 
+            base.get('class_size_bin', '60-200'),
+            class_size_order
+        )
+        scores.append(class_size_score)
+        
+        # Setting - with normalized comparison and distance
+        user_setting = normalize_string(SET) if SET else ''
+        prog_setting = normalize_string(base.get('setting', ''))
+        
+        setting_order = ['urban', 'suburban', 'small town', 'rural']
+        
+        if user_setting == prog_setting:
             scores.append(1.0)
         else:
-            if CSB == "< 60" and base.get('class_size_bin') == "60-200":
-                scores.append(0.5)
-            elif CSB == "200+" and base.get('class_size_bin') == "60-200":
-                scores.append(0.5)
+            user_setting_mapped = user_setting.replace('-', ' ')
+            prog_setting_mapped = prog_setting.replace('-', ' ')
+            
+            if user_setting_mapped in setting_order and prog_setting_mapped in setting_order:
+                scores.append(score_categorical_distance(user_setting_mapped, prog_setting_mapped, setting_order))
             else:
-                scores.append(0.0)
-        if base.get('setting') == SET:
-            scores.append(1.0)
-        else:
-            urban_suburban = {"Urban", "Suburban"}
-            rural_small = {"Small-town", "Rural"}
-            if SET in urban_suburban and base.get('setting') in urban_suburban:
-                scores.append(0.5)
-            elif SET in rural_small and base.get('setting') in rural_small:
-                scores.append(0.5)
-            else:
-                scores.append(0.0)
-        hs_prog = set(base.get('housing_styles', []))
-        if hs_prog:
-            housing_score = len(HS.intersection(hs_prog)) / len(HS) if HS else 0
+                urban_suburban = {'urban', 'suburban'}
+                rural_small = {'small town', 'rural', 'small-town'}
+                
+                if user_setting in urban_suburban and prog_setting in urban_suburban:
+                    scores.append(0.6)
+                elif user_setting in rural_small and prog_setting in rural_small:
+                    scores.append(0.6)
+                else:
+                    scores.append(0.2)
+        
+        # Housing style - with normalization
+        hs_prog = {normalize_string(h) for h in base.get('housing_styles', [])}
+        user_hs = {normalize_string(h) for h in HS} if HS else set()
+        
+        if hs_prog and user_hs:
+            housing_score = len(user_hs.intersection(hs_prog)) / len(user_hs)
             scores.append(housing_score)
+        elif not user_hs:
+            scores.append(0.5)
         else:
-            scores.append(0.0)
-        if base.get('campus_size') == CPS:
-            scores.append(1.0)
-        else:
-            sizes = ["Small", "Medium", "Large"]
-            user_idx = sizes.index(CPS) if CPS in sizes else -1
-            prog_idx = sizes.index(base.get('campus_size')) if base.get('campus_size') in sizes else -1
-            if user_idx != -1 and prog_idx != -1:
-                scores.append(0.5 if abs(user_idx - prog_idx) == 1 else 0.0)
-            else:
-                scores.append(0.0)
+            scores.append(0.2)
+        
+        # Campus size - using distance-based scoring
+        campus_size_order = ["Small", "Medium", "Large"]
+        user_cps = CPS if CPS else 'Medium'
+        prog_cps = base.get('campus_size', 'Medium')
+        
+        user_cps_normalized = user_cps.capitalize() if user_cps else 'Medium'
+        prog_cps_normalized = prog_cps.capitalize() if prog_cps else 'Medium'
+        
+        campus_score = score_categorical_distance(user_cps_normalized, prog_cps_normalized, campus_size_order)
+        scores.append(campus_score)
+        
         return sum(scores) / len(scores)
 
     def score_social(p):
         base = p['social']
+        
+        # Night scene - with confidence weighting
         prog_ns = base.get('night_scene', 3)
-        ns_score = 1 - (abs(prog_ns - NS) / 4.0)
-        sp_prog = set(base.get('sports', []))
-        if "None" in SPT:
+        ns_score = calculate_trait_score_with_confidence(NS, prog_ns)
+        
+        # Sports - with normalization
+        sp_prog = {normalize_string(s) for s in base.get('sports', [])}
+        user_spt = {normalize_string(s) for s in SPT} if SPT else set()
+        
+        if "none" in user_spt or not user_spt:
             spt_score = 1.0
         else:
-            spt_score = len(sp_prog.intersection(SPT)) / max(len(SPT), 1)
-        cl_prog = set(base.get('clubs', []))
-        cl_score = len(cl_prog.intersection(CLB)) / max(len(CLB), 1) if CLB else 0.5
+            spt_score = len(sp_prog.intersection(user_spt)) / max(len(user_spt), 1)
+        
+        # Clubs - with normalization
+        cl_prog = {normalize_string(c) for c in base.get('clubs', [])}
+        user_clb = {normalize_string(c) for c in CLB} if CLB else set()
+        
+        if user_clb:
+            cl_score = len(cl_prog.intersection(user_clb)) / len(user_clb)
+        else:
+            cl_score = 0.5
+        
+        # Cultural events - with confidence weighting
         prog_cev = base.get('cultural_event_freq', 3)
-        cev_score = 1 - (abs(prog_cev - CEV) / 4.0)
+        cev_score = calculate_trait_score_with_confidence(CEV, prog_cev)
+        
         return (ns_score + spt_score + cl_score + cev_score) / 4
 
     results = []
@@ -161,9 +218,7 @@ def compute_matches(answers, num_results=10):
 @app.route('/api/match', methods=['POST'])
 def match_api():
     try:
-        print("Request received!")  # Debug print
         data = request.json
-        print("Received data:", data)  # Debug print
         matches = compute_matches(data)
         return jsonify(matches)
     except Exception as e:
@@ -173,9 +228,7 @@ def match_api():
 @app.route('/api/chance-me', methods=['POST'])
 def chance_me_api():
     try:
-        print("ChanceMe request received!")  # Debug print
         data = request.json
-        print("Received ChanceMe data:", data)  # Debug print
         
         # Extract data from request
         university = data.get('school', '')
@@ -189,7 +242,7 @@ def chance_me_api():
             ecs = [ec.strip() for ec in ecs_input.split(',') if ec.strip()]
         
         # Path to CSV file (adjust this path as needed)
-        csv_path = 'backend/admissionsData.csv'
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'admissionsData.csv')
         
         # Get prediction
         result = predict_admission_chance(csv_path, university, program, top6_avg, ecs)
@@ -330,5 +383,6 @@ def get_program_mentors(program_key):
         return jsonify([])
 
 if __name__ == '__main__':
-    print("Starting Flask server on port 5001...")
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    port = int(os.environ.get('PORT', 5001))
+    print(f"Starting Flask server on port {port}...")
+    app.run(host='0.0.0.0', port=port, debug=False)

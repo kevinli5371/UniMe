@@ -9,39 +9,39 @@ import './styling/checkbox.css'; // Import the CSS file for checkbox styles
 import './styling/radio.css'; // Import the CSS file for radio styles
 
 interface QuizOption {
-  id: string;
-  label: string;
-  value: string | number;
+    id: string;
+    label: string;
+    value: string | number;
 }
 
 interface QuizQuestion {
-  id: string;
-  question: string;
-  type: string;
-  options: QuizOption[];
-  maxSelections?: number;
-  scale?: number;
-  leftLabel?: string;
-  rightLabel?: string;
-  min?: number;
-  max?: number;
-  defaultValue?: number;
-  placeholder?: string;
-  conditional?: {
-    dependsOn: string;
-    requiredValue: string;
-  };
+    id: string;
+    question: string;
+    type: string;
+    options: QuizOption[];
+    maxSelections?: number;
+    scale?: number;
+    leftLabel?: string;
+    rightLabel?: string;
+    min?: number;
+    max?: number;
+    defaultValue?: number;
+    placeholder?: string;
+    conditional?: {
+        dependsOn: string;
+        requiredValue: string;
+    };
 }
 
 interface QuizSection {
-  id: string;
-  title: string;
-  questions: QuizQuestion[];
+    id: string;
+    title: string;
+    questions: QuizQuestion[];
 }
 
 interface QuizData {
-  title: string;
-  sections: QuizSection[];
+    title: string;
+    sections: QuizSection[];
 }
 
 // Type assertion to fix the import issue
@@ -61,7 +61,7 @@ export default function Quiz() {
                 };
             } else if (currentSelections.length < maxSelections) {
                 return {
-                    ...prevAnswers, 
+                    ...prevAnswers,
                     [questionId]: [...currentSelections, optionValue]
                 };
             }
@@ -102,7 +102,7 @@ export default function Quiz() {
         const allQuestions = typedQuizData.sections.flatMap(section => section.questions);
         return allQuestions.every(question => {
             const answer = answers[question.id];
-            
+
             if (question.type === 'checkbox') {
                 // For checkbox questions, answer should be an array with at least one item
                 return Array.isArray(answer) && answer.length > 0;
@@ -118,14 +118,24 @@ export default function Quiz() {
 
     // Submit handler
     const handleSubmit = async () => {
-        const res = await fetch("http://localhost:5001/api/match", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(answers),
-        });
-        const matches = await res.json();
-        localStorage.setItem("matches", JSON.stringify(matches));
-        router.push("/matches");
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/match`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(answers),
+            });
+
+            if (!res.ok) {
+                throw new Error(`Server error: ${res.status}`);
+            }
+
+            const matches = await res.json();
+            localStorage.setItem("matches", JSON.stringify(matches));
+            router.push("/matches");
+        } catch (error) {
+            console.error("Quiz submit error:", error);
+            alert("Failed to submit quiz. Please try again later.");
+        }
     };
 
     // Render checkbox question
@@ -134,17 +144,17 @@ export default function Quiz() {
             <h3 className="checkbox-question">
                 {question.question}
             </h3>
-            
+
             <p className="checkbox-selection-info">
-                Select up to {question.maxSelections} option{(question.maxSelections || 0) > 1 ? 's' : ''} 
+                Select up to {question.maxSelections} option{(question.maxSelections || 0) > 1 ? 's' : ''}
                 ({getSelectionCount(question.id)}/{question.maxSelections} selected)
             </p>
-            
+
             <div className="checkbox-grid">
                 {question.options.map((option) => {
                     const isSelected = ((answers[question.id] as string[]) || []).includes(String(option.value));
                     const isDisabled = isCheckboxDisabled(question.id, String(option.value), question.maxSelections || 1);
-                    
+
                     return (
                         <label
                             key={option.id}
@@ -173,11 +183,11 @@ export default function Quiz() {
             <h3 className="radio-question">
                 {question.question}
             </h3>
-            
+
             <div className="radio-options">
                 {question.options.map((option) => {
                     const isSelected = answers[question.id] === String(option.value);
-                    
+
                     return (
                         <label
                             key={option.id}
@@ -204,22 +214,22 @@ export default function Quiz() {
     const renderLikertQuestion = (question: QuizQuestion) => {
         // Calculate the total number of options for dynamic CSS
         const totalOptions = question.options.length;
-        
+
         return (
-            <div 
-                key={question.id} 
+            <div
+                key={question.id}
                 className="likert-container"
                 style={{ '--likert-total': totalOptions } as React.CSSProperties}
             >
                 <h3 className="likert-question">
                     {question.question}
                 </h3>
-                
+
                 <div className="likert-options">
                     <p>{question.leftLabel}</p>
                     {question.options.map((option, index) => {
                         const isSelected = answers[question.id] === String(option.value);
-                        
+
                         return (
                             <label key={option.id} className="likert-option">
                                 <input
@@ -241,6 +251,9 @@ export default function Quiz() {
 
     return (
         <div className="quiz-container">
+            <Link href="/" className="back-button">
+                ← Back to Home
+            </Link>
             <div className="header">
                 <h1>get matched for free</h1>
                 <p className="subtext">Based on Ontario University Data</p>
@@ -303,15 +316,15 @@ export default function Quiz() {
                 >
                     Submit Quiz
                 </button>
-            {/* Debug section */}
-            <div>
-            {/* Add padding to the debug section */}
-            <div style={{ padding: '40px' }}>
-                {/* Debug info (optional): */}
-                {/* <pre>{JSON.stringify(answers, null, 2)}</pre> */}
-            </div>
+                {/* Debug section */}
+                <div>
+                    {/* Add padding to the debug section */}
+                    <div style={{ padding: '40px' }}>
+                        {/* Debug info (optional): */}
+                        {/* <pre>{JSON.stringify(answers, null, 2)}</pre> */}
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     );
 }

@@ -5,6 +5,30 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Back to Home Button */
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 25px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+    transform: translateX(-5px);
+}
+
 .matches-container {
     width: 100%;
     min-height: 100vh;
@@ -153,20 +177,21 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .fixed-download-button:hover {
+}
+
+.fixed-download-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
     background-color: #0861A4;
-  }
-  
-  .fixed-download-button:disabled {
+}
+
+.fixed-download-button:disabled {
     background-color: #7AADD2;
     cursor: not-allowed;
     transform: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
+}
+
 .popup {
     max-width: 600px;
     background: #70B1D9;
@@ -350,11 +375,12 @@ body {
         flex-direction: column;
         gap: 30px;
     }
-    
-    .match-list, .popup {
+
+    .match-list,
+    .popup {
         max-width: 100%;
     }
-    
+
     .matches-title {
         font-size: 2.5rem;
     }
@@ -364,28 +390,28 @@ body {
     .matches-content {
         padding: 20px;
     }
-    
+
     .matches-title {
         font-size: 2rem;
     }
-    
+
     .match {
         padding: 20px 25px;
     }
-    
+
     .popup {
         padding: 25px;
     }
-    
+
     .mentors-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .stats-grid {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .links-section {
         flex-direction: column;
         gap: 15px;

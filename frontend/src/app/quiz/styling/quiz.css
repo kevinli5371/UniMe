@@ -1,3 +1,51 @@
+html.quiz-scroll {
+    scroll-behavior: smooth;
+}
+
+.quiz-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.12);
+    z-index: 200;
+}
+
+.quiz-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #36A8B4, #70B1D9);
+    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 0 2px 2px 0;
+}
+
+.quiz-question-item {
+    scroll-margin-top: 60px;
+    scroll-margin-bottom: 60px;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    padding: 2rem 0;
+}
+
+.quiz-not-started .quiz-question-item {
+    opacity: 0.35;
+}
+
+.quiz-not-started .quiz-question-item.question-active {
+    opacity: 1;
+}
+
+.quiz-started .quiz-question-item.question-active {
+    opacity: 1;
+}
+
+.quiz-started .quiz-question-item.question-past {
+    opacity: 0.45;
+}
+
+.quiz-started .quiz-question-item.question-future {
+    opacity: 0.3;
+}
+
 .quiz-container {
     display: flex;
     flex-direction: column;

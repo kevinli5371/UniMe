@@ -6,7 +6,7 @@ html {
 .home {
     width: 100vw;
     background: url('./background.PNG') no-repeat center calc(-20vh);
-    opacity: 0.7;
+    opacity: 1;
     background-size: cover;
 }
 
@@ -123,6 +123,20 @@ html {
     animation: fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
+.landing .text h1,
+.landing .text p {
+    opacity: 1;
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.landing .text p {
+    animation-delay: 0.1s;
+}
+
+.landing .text h1 {
+    animation-delay: 0.2s;
+}
+
 .landing .button-container {
     animation-delay: 0.3s;
 }
@@ -175,6 +189,10 @@ html {
 .matchme button, .chanceme button {
     width: 16rem;
     height: 4rem;
+}
+
+.chanceme button:hover {
+    box-shadow: 0 8px 25px rgba(0, 48, 190, 0.719);
 }
 
 /* Responsive design */

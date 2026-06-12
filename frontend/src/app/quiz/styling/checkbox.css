@@ -25,7 +25,39 @@
   display: grid;
   gridTemplateColumns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 10px;
-  margin-bottom: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-continue {
+  margin-bottom: 3rem;
+  padding: 0.65rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: white;
+  background-color: #36A8B4;
+  border: none;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: checkboxContinueIn 0.3s ease forwards;
+}
+
+.checkbox-continue:hover {
+  background-color: #2a7f8c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(42, 127, 140, 0.35);
+}
+
+@keyframes checkboxContinueIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .checkbox-option {
